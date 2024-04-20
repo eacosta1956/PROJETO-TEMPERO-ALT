@@ -1,36 +1,45 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import HomeScreen from './src/screens/HomeScreen';
-import CadastrarProdutoScreen from './src/screens/CadastrarProdutoScreen';
-import EditarProdutoScreen from './src/screens/EditarProdutoScreen';
-import ListarProdutosScreen from './src/screens/ListarProdutosScreen';
-import AtualizarEstoqueScreen from './src/screens/AtualizarEstoqueScreen';
-import ExcluirProdutoScreen from './src/screens/ExcluirProdutoScreen';
-import GerarRelatoriosScreen from './src/screens/GerarRelatoriosScreen';
-import ConsultarBancoScreen from './src/screens/ConsultarBancoScreen';
-import { criaTabelas } from './src/database/ControleEstoque';
+import Home from './src/telas/Home';
+import CadastrarProduto from './src/telas/CadastrarProduto';
+import EditarProduto from './src/telas/EditarProduto';
+import ListarProdutos from './src/telas/ListarProdutos';
+import AtualizarEstoque from './src/telas/AtualizarEstoque';
+import ExcluirProduto from './src/telas/ExcluirProduto';
+import GerarRelatorios from './src/telas/GerarRelatorios';
+import ConsultarBanco from './src/telas/ConsultarBanco';
+import { criaTabelas } from './src/database/CriaTabelas';
 
 // Configuração da navegação
+// -------------------------
 const Stack = createStackNavigator();
 
+// Função principal
+// ----------------
 export default function App() {
-  // Criar as tabelas ao iniciar o aplicativo
+  // Cria as tabelas no banco de dados ao iniciar o aplicativo
+  // ---------------------------------------------------------
   React.useEffect(() => {
     criaTabelas();
   }, []);
 
+
+  // Retorno da função principal
+  // Esse trecho de código está configurando a navegação do
+  // aplicativo usando o React Navigation
+  // ------------------------------------------------------
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="CadastrarProduto" component={CadastrarProdutoScreen} />
-        <Stack.Screen name="EditarProduto" component={EditarProdutoScreen} />
-        <Stack.Screen name="ListarProdutos" component={ListarProdutosScreen} />
-        <Stack.Screen name="AtualizarEstoque" component={AtualizarEstoqueScreen} />
-        <Stack.Screen name="ExcluirProduto" component={ExcluirProdutoScreen} />
-        <Stack.Screen name="GerarRelatorios" component={GerarRelatoriosScreen} />
-        <Stack.Screen name="ConsultarBanco" component={ConsultarBancoScreen} />
+        <Stack.Screen name="Home" component={Home} />
+        <Stack.Screen name="CadastrarProduto" component={CadastrarProduto} />
+        <Stack.Screen name="EditarProduto" component={EditarProduto} />
+        <Stack.Screen name="ListarProdutos" component={ListarProdutos} />
+        <Stack.Screen name="AtualizarEstoque" component={AtualizarEstoque} />
+        <Stack.Screen name="ExcluirProduto" component={ExcluirProduto} />
+        <Stack.Screen name="GerarRelatorios" component={GerarRelatorios} />
+        <Stack.Screen name="ConsultarBanco" component={ConsultarBanco} />
       </Stack.Navigator>
     </NavigationContainer>
   );

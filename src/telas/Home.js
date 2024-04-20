@@ -1,7 +1,10 @@
 import React from 'react';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 
-export default function HomeScreen({ navigation }) {
+
+// Função principal - responsável por exibir a tela de entrada do aplicativo
+// -------------------------------------------------------------------------
+export default function Home({ navigation }) {
   return (
     <View style={styles.container}>
 
@@ -9,20 +12,8 @@ export default function HomeScreen({ navigation }) {
         <Text style={styles.buttonText}>Cadastrar Produto</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('EditarProduto')}>
-        <Text style={styles.buttonText}>Editar Produto</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('AtualizarEstoque')}>
-        <Text style={styles.buttonText}>Atualizar Estoque</Text>
-      </TouchableOpacity>
-
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ListarProdutos')}>
         <Text style={styles.buttonText}>Listar Produtos</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ExcluirProduto')}>
-        <Text style={styles.buttonText}>Excluir Produto</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('GerarRelatorios')}>
@@ -37,6 +28,8 @@ export default function HomeScreen({ navigation }) {
   );
 }
 
+// Estilização
+// ----------
 const styles = StyleSheet.create({
   container: {
     flex: 1,

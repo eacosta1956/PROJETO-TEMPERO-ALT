@@ -1,37 +1,52 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Alert, Modal, StyleSheet } from 'react-native';
-import { db } from '../database/SQLite';
-import { useFocusEffect } from '@react-navigation/native';
+import { db } from '../database/AbreConexao';
 
-export default function ExcluirProdutoScreen({ route, navigation }) {
+
+// Função principal
+// ----------------
+export default function ExcluirProduto({ route, navigation }) {
   const [produto, setProduto] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
 
+
+  // É um Hook. Acionado quando a tela ExcluirProduto é carregada
+  // ------------------------------------------------------------
   useEffect(() => {
-    // Obter o produto passado pela navegação
+    // Obtém o produto passado pela navegação
     if (route.params && route.params.produto) {
       setProduto(route.params.produto);
+      console.log("id do produto: ", route.params.produto.id_produto)
     }
   }, [route.params]);
-
+    
+  // Acionada quando o botão Excluir produto é pressionado. Carrega um modal.
+  // -----------------------------------------------------------------------
   const confirmarExclusao = () => {
     setModalVisible(true);
   };
 
+  // Acionada quando o usuário confirma, no modal, a exclusão do produto
+  // -------------------------------------------------------------------
   const excluirProduto = () => {
     if (!produto) {
       Alert.alert('Erro', 'Produto não encontrado.');
       return;
     }
 
+    // Exclui o produto da tabela produtos
+    // -----------------------------------
     db.transaction((transaction) => {
       transaction.executeSql(
         `DELETE FROM produtos WHERE id_produto = ?;`,
         [produto.id_produto],
         (_, { rowsAffected }) => {
           if (rowsAffected > 0) {
+
+            // Exclui o produto da tabela estoque
+            // ----------------------------------
             transaction.executeSql(
-              `DELETE FROM estoque_atual WHERE id_produto = ?;`,
+              `DELETE FROM estoque WHERE id_produto = ?;`,
               [produto.id_produto],
               (_, { rowsAffected: rowsAffectedEstoque }) => {
                 if (rowsAffectedEstoque > 0) {
@@ -39,13 +54,13 @@ export default function ExcluirProdutoScreen({ route, navigation }) {
                   setModalVisible(false);
                   navigation.goBack(); // Volta para a tela anterior
                 } else {
-                  Alert.alert('Erro', 'Erro ao excluir produto do estoque atual.');
+                  Alert.alert('Erro', 'Erro ao excluir produto do estoque.');
                 }
               },
               (_, error) => {
                 Alert.alert('Erro', 'Erro ao excluir produto do estoque atual: ' + error);
               }
-            );
+            ); 
           } else {
             Alert.alert('Erro', 'Erro ao excluir produto.');
           }
@@ -57,6 +72,8 @@ export default function ExcluirProdutoScreen({ route, navigation }) {
     });
   };
 
+  // Retorno da função principal
+  // ---------------------------
   return (
     <View style={styles.container}>
       <View>
@@ -104,6 +121,9 @@ export default function ExcluirProdutoScreen({ route, navigation }) {
   );
 }
 
+
+// Estilização
+// -----------
 const styles = StyleSheet.create({
   container: {
     flex: 1,

@@ -1,17 +1,23 @@
-import { db } from "./SQLite" // Importe o banco de dados SQLite
+import { db } from "./AbreConexao"
 
 export function consultarTodasTabelas() {
+
     db.transaction((transaction) => {
       const consultas = [
         'SELECT * FROM produtos;',
         'SELECT * FROM entrada_saida;',
-        'SELECT * FROM estoque_atual;'
+        'SELECT * FROM estoque;'
       ];
   
       function executarConsulta(indiceConsulta) {
         const consultaAtual = consultas[indiceConsulta];
+        console.log('\n');
+        console.log('\n');
+        
+        console.log('\n');
         console.log(`Executando consulta: ${consultaAtual}`);
-  
+        console.log('\n');
+        
         transaction.executeSql(
           consultaAtual,
           [],
@@ -20,6 +26,7 @@ export function consultarTodasTabelas() {
   
             // Imprimir os resultados da consulta atual em linhas e colunas
             console.log(`=== Resultados da consulta ${indiceConsulta} ===`);
+            console.log('\n');
             resultados.forEach((resultado, index) => {
               console.log(`Registro ${index + 1}:`);
               Object.keys(resultado).forEach((key) => {
