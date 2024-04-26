@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal, Button  } from 'react-native';
 import { db } from '../database/AbreConexao';
 
 
@@ -8,7 +8,9 @@ import { db } from '../database/AbreConexao';
 export default function AtualizarEstoque({ route, navigation }) {
   const [produto, setProduto] = useState(null);
   const [quantidade, setQuantidade] = useState('');
-  const [estoqueAtual, setEstoqueAtual] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
+  const [operacaoSucesso, setOperacaoSucesso] = useState(false);
 
 
   // É um Hook. Acionado quando a tela AtualizarEstoque é carregada
@@ -36,7 +38,8 @@ export default function AtualizarEstoque({ route, navigation }) {
     // Verifica se a quantidade a ser retirada é maior que o estoque. Se for, aborta a operação
     // ----------------------------------------------------------------------------------------
     if (operacao === 'retirar' && qtdInt > produto.estoque_atual) {
-      Alert.alert('Atenção', 'Quantidade a retirar maior que o estoque atual!');
+      setModalMessage('Quantidade a retirar maior que o estoque atual!');
+      setModalVisible(true);
       setQuantidade(null)
       return;
     }
@@ -67,21 +70,24 @@ export default function AtualizarEstoque({ route, navigation }) {
               `INSERT INTO entrada_saida (id_produto, quantidade, data_atualizacao, estoque_atual) VALUES (?, ?, ?, ?);`,
               [produto.id_produto, qtdMovimentada, dataAtual,qtdMovimentada + produto.estoque_atual],
               () => {
-                //console.log(qtdMovimentada + produto.estoque_atual);
-                Alert.alert('Sucesso', 'Movimentação de estoque realizada com sucesso!');
+                setModalMessage('Movimentação de estoque realizada com sucesso!');
+                setOperacaoSucesso(true);
+                setModalVisible(true);
                 setQuantidade('');
-                navigation.navigate('ListarProdutos');
               },
               (_, error) => {
-                Alert.alert('Erro', 'Erro ao salvar movimentação de estoque: ' + error);
+                //setModalMessage('Erro', 'Erro ao salvar movimentação de estoque: ' + error);
+                //setModalVisible(true);
               }
             );
           } else {
-            Alert.alert('Erro', 'Produto não encontrado ou erro ao atualizar estoque.');
+            //setModalMessage('Erro', 'Produto não encontrado ou erro ao atualizar estoque.');
+            //setModalVisible(true);
           }
         },
         (_, error) => {
-          Alert.alert('Erro', 'Erro ao atualizar estoque: ' + error);
+          //setModalMessage('Erro', 'Erro ao atualizar estoque: ' + error);
+          //setModalVisible(true);
         }
       );
     });
@@ -101,28 +107,57 @@ export default function AtualizarEstoque({ route, navigation }) {
           setProduto(produtoAtualizado); // Atualiza o estado do produto
         },
         (_, error) => {
-          Alert.alert('Erro', 'Erro ao buscar produto atualizado: ' + error);
+          //setModalMessage('Erro', 'Erro ao buscar produto atualizado: ' + error);
+          //setModalVisible(true);
         }
       );
     });
   };
+
+  const CustomModal = () => {
+    return (
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>{modalMessage}</Text>
+            <Button
+              title="OK"
+              onPress={() => {
+                setModalVisible(false);
+              if (operacaoSucesso) {
+                navigation.navigate('ListarProdutos');
+              }
+              }}
+            />
+          </View>
+        </View>
+      </Modal>
+    );
+  };
+  
 
 
   // Retorno da função principal
   // ---------------------------
   return (
     <View style={styles.container}>
+      
       <View>
         {produto && (
           <>
             <Text>Nome do Produto: {produto.nome_produto}</Text>
             <Text>ID do Produto: {produto.id_produto}</Text>
             <Text>Estoque Atual: {produto.estoque_atual}</Text>
-            <Text>Estoque Segurança: {produto.estoque_seguranca}</Text>
             <Text>Estoque Mínimo: {produto.estoque_minimo}</Text>
           </>
         )}
       </View>
+
       <TextInput
         style={styles.input}
         placeholder="Quantidade"
@@ -130,18 +165,23 @@ export default function AtualizarEstoque({ route, navigation }) {
         value={quantidade}
         onChangeText={(text) => setQuantidade(text)}
       />
+
       <TouchableOpacity
         style={[styles.button, { backgroundColor: '#27ae60' }]}
         onPress={() => salvarMovimentacaoEstoque('adicionar')}
       >
         <Text style={styles.buttonText}>Adicionar</Text>
       </TouchableOpacity>
+
       <TouchableOpacity
         style={[styles.button, { backgroundColor: '#e74c3c' }]}
         onPress={() => salvarMovimentacaoEstoque('retirar')}
       >
         <Text style={styles.buttonText}>Retirar</Text>
       </TouchableOpacity>
+
+      <CustomModal />
+
     </View>
   );
 }
@@ -174,5 +214,32 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    borderWidth: 1, // Adicionando uma borda
+    borderColor: '#aaa', // Cor da borda
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
   },
 });

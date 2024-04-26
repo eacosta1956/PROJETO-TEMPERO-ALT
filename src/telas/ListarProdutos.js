@@ -1,49 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { db } from '../database/AbreConexao';
 
-
-// Função principal
-// ----------------
 export default function ListarProdutos({ navigation }) {
   const [produtos, setProdutos] = useState([]);
   const [produtoSelecionado, setProdutoSelecionado] = useState(null);
   const [itemSelecionado, setSelectedItem] = useState(null);
-  const [filtroSelecionado, setFiltroSelecionado] = useState('Todos');
-  const [ordenacaoSelecionada, setOrdenacaoSelecionada] = useState('Nome');
   const [totalProdutos, setTotalProdutos] = useState(0);
-  const [totalBebidas, setTotalBebidas] = useState(0);
-  const [totalComidas, setTotalComidas] = useState(0);
-  const [totalEstoqueSeguranca, setTotalEstoqueSeguranca] = useState(0);
   const [totalEstoqueMinimo, setTotalEstoqueMinimo] = useState(0);
-  
-  // Atualiza a tela quando esta for carregada ou um botão (ordenacao selecionada) 
-  // ou um filtro (opção selecionada)
-  // -----------------------------------------------------------------------------
-  useEffect(() => {
-    carregarProdutos(); // Carrega os produtos ao carregar a tela ListarProdutos e ao mudar a opção selecionada
-  }, [filtroSelecionado, ordenacaoSelecionada]);
+  const [filtroNomeProduto, setFiltroNomeProduto] = useState('');
+  const [filtroEstoqueMinimo, setFiltroEstoqueMinimo] = useState(false);
+  //const [filtroAtivo, setFiltroAtivo] = useState(false); // Novo state para controle do filtro
 
-  // Recarrega os produtos sempre que a tela ListarProdutos for focada novamente
-  // ---------------------------------------------------------------------------
+  useEffect(() => {
+    carregarProdutos();
+  }, [filtroEstoqueMinimo, filtroNomeProduto]);
+
   useFocusEffect(
     React.useCallback(() => {
       carregarTotais();
-      setFiltroSelecionado('Todos');
-      setOrdenacaoSelecionada('Nome')
+      setFiltroEstoqueMinimo(false);
+      setFiltroNomeProduto('');
       carregarProdutos();
     }, [])
   );
-  // Essa é uma função responsável por contar a qtde total de produtos cadastrados,
-  // a qtde de produtos do tipo comida, a qtde de produtos do tipo bebida,
-  // a qtde de produtos cujo estoque esteja <= estoque de segurança e
-  // a qtde de produtos cujo estqoque esteja <= estoque mínimo.
-  // -----------------------------------------------------------------------------
-  const carregarTotais = () => {
 
-    // Conta a quantidade de produtos cadastrados
-    // ------------------------------------------
+  const carregarTotais = () => {
     db.transaction((transaction) => {
       transaction.executeSql(
         `SELECT COUNT(*) AS total FROM produtos`,
@@ -56,53 +39,7 @@ export default function ListarProdutos({ navigation }) {
           console.log('Erro ao carregar total de produtos: ' + error);
         }
       );
-      
-      // Conta a quantidade de bebidas cadastradas
-      // -----------------------------------------
-      transaction.executeSql(
-        `SELECT COUNT(*) AS total FROM produtos WHERE tipo_produto = 'Bebida'`,
-        [],
-        (_, { rows }) => {
-          const totalBebidas = rows._array[0].total;
-          setTotalBebidas(totalBebidas);
-        },
-        (_, error) => {
-          console.log('Erro ao carregar total de bebidas: ' + error);
-        }
-      );
-  
-      // Conta a quantidade de comidas cadastradas
-      // -----------------------------------------
-      transaction.executeSql(
-        `SELECT COUNT(*) AS total FROM produtos WHERE tipo_produto = 'Comida'`,
-        [],
-        (_, { rows }) => {
-          const totalComidas = rows._array[0].total;
-          setTotalComidas(totalComidas);
-        },
-        (_, error) => {
-          console.log('Erro ao carregar total de comidas: ' + error);
-        }
-      );
-  
-      // Conta a quantidade de produtos cujo estoque atingiu o nível de estoque de segurança
-      // -----------------------------------------------------------------------------------
-      transaction.executeSql(
-        `SELECT COUNT(*) AS total FROM produtos 
-        INNER JOIN estoque ON produtos.id_produto = estoque.id_produto 
-        WHERE estoque.estoque_atual <= produtos.estoque_seguranca`,
-        [],
-        (_, { rows }) => {
-          const totalEstoqueSeguranca = rows._array[0].total;
-          setTotalEstoqueSeguranca(totalEstoqueSeguranca);
-        },
-        (_, error) => {
-          console.log('Erro ao carregar total de produtos com estoque de segurança: ' + error);
-        }
-      );
-  
-      // Conta a quantidade de produtos cujo estoque atingiu o nível de estoque mínimo
-      // ----------------------------------------------------------------------------- 
+
       transaction.executeSql(
         `SELECT COUNT(*) AS total FROM produtos 
         INNER JOIN estoque ON produtos.id_produto = estoque.id_produto 
@@ -119,35 +56,23 @@ export default function ListarProdutos({ navigation }) {
     });
   };
 
-  // Carrega os produtos na tela conforme o filtro e o botão de ordenação
-  // selecionado no alto da tela
-  // --------------------------------------------------------------------
   const carregarProdutos = () => {
     db.transaction((transaction) => {
-      let query = `SELECT p.id_produto, p.nome_produto, p.estoque_seguranca, p.estoque_minimo, e.estoque_atual 
-      FROM produtos AS p 
-      LEFT JOIN estoque AS e ON p.id_produto = e.id_produto`;
+      let query = `SELECT p.id_produto, p.nome_produto, p.estoque_minimo, e.estoque_atual 
+        FROM produtos AS p 
+        LEFT JOIN estoque AS e ON p.id_produto = e.id_produto`;
   
-      // Aplica filtro conforme a opção selecionada
-      // ------------------------------------------
-      if (filtroSelecionado === 'Bebida') {
-        query += ' WHERE p.tipo_produto = "Bebida"';
-      } else if (filtroSelecionado === 'Comida') {
-        query += ' WHERE p.tipo_produto = "Comida"';
-      } else if (filtroSelecionado === 'EstoqueSeguranca') {
-        query += ' WHERE e.estoque_atual <= p.estoque_seguranca';
-      } else if (filtroSelecionado === 'EstoqueMinimo') {
+      if (filtroEstoqueMinimo) {
         query += ' WHERE e.estoque_atual <= p.estoque_minimo';
       }
-
-      // Aplica ordenação conforme a opção selecionada
-      // ---------------------------------------------
-      if (ordenacaoSelecionada === 'ID') {
-        query += ' ORDER BY p.id_produto';
-      } else if (ordenacaoSelecionada === 'Nome') {
-        query += ' ORDER BY p.nome_produto';
+  
+      if (filtroNomeProduto.trim() !== '') {
+        const searchTerm = filtroNomeProduto.trim().toLowerCase(); // Remover espaços em branco e tornar minúsculas
+        query += ` WHERE LOWER(p.nome_produto) LIKE '%${searchTerm}%'`;
       }
-
+  
+      query += ' ORDER BY p.nome_produto';
+  
       transaction.executeSql(
         query,
         [],
@@ -161,55 +86,31 @@ export default function ListarProdutos({ navigation }) {
       );
     });
   };
-
-    // Seleciona e retira a seleção de um produto ao tocá-lo na tela
-  // ---------------------------------------------------------------
+  
   const handleSelecionarProduto = (produto) => {
     if (produto.id_produto === itemSelecionado) {
-      setSelectedItem(null); // Desselecionar o produto ao pressioná-lo novamente
-      setProdutoSelecionado(null); // Limpar produto selecionado ao desmarcar
+      setSelectedItem(null);
+      setProdutoSelecionado(null);
     } else {
-      setSelectedItem(produto.id_produto); // Selecionar o produto ao pressioná-lo
-      setProdutoSelecionado(produto); // Atualizar produto selecionado
-    }
-      
-    // Reseta a seleção dos botões ao retirar a seleção do item
-    // --------------------------------------------------------
-    if (itemSelecionado === produto.id_produto) {
-      setFiltroSelecionado('Todos');
+      setSelectedItem(produto.id_produto);
+      setProdutoSelecionado(produto);
     }
   };
 
-  // Recarrega a lista de produtos após a atualização do estoque
-  // ----------------------------------------------------------- 
-  /* const atualizarProdutosLista = () => {
-    carregarProdutos();
-  }; */
-
-  // Acionada quando o botão Atualizar Estoque é selecionado
-  // Carrega a tela AtualizarEstoque se um produto estiver selecionado
-  // -----------------------------------------------------------------
   const handleAtualizarEstoque = () => {
     if (produtoSelecionado && itemSelecionado) {
       navigation.navigate('AtualizarEstoque', { produto: produtoSelecionado });
       setSelectedItem(null);
-      // atualizarProdutosLista();
     }
   };
 
-  // Acionada quando o botão Editar Registro é selecionado
-  // Carrega a tela EditarProduto se um produto estiver selecionado
-  // --------------------------------------------------------------
   const handleEditarProduto = () => {
     if (produtoSelecionado && itemSelecionado) {
       navigation.navigate('EditarProduto', { produto: produtoSelecionado });
       setSelectedItem(null);
     }
   };
-  
-  // Acionada quando o botão Excluir Registro é selecionado
-  // Carrega a tela ExcluirrProduto se um produto estiver selecionado
-  // ----------------------------------------------------------------
+
   const handleExcluirProduto = () => {
     if (produtoSelecionado && itemSelecionado) {
       navigation.navigate('ExcluirProduto', { produto: produtoSelecionado });
@@ -217,149 +118,58 @@ export default function ListarProdutos({ navigation }) {
     }
   };
 
-  // Acionada quando um dos filtros (Todos, Bebida ou Comida) é selecionado
-  // ----------------------------------------------------------------------
-  const handleOpcaoSelecionada = (opcao) => {
-    setFiltroSelecionado(opcao);
-    carregarProdutos();
-  };
-
-  // Acionada quando um dos botões (Ordenar por ID ou Ordenar por Nome) é selecionado
-  // --------------------------------------------------------------------------------
-  const handleOrdenarPor = (opcao) => {
-    setOrdenacaoSelecionada(opcao);
-    carregarProdutos();
-  };
-
-// Acionada quando o filtro Estoque Seguranca é selecionado
-  // --------------------------------------------------------
-  const handleEstoqueSeguranca = () => {
-    setFiltroSelecionado('EstoqueSeguranca');
-  };
-
-  // Acionada quando o filtro Estoque Mínimo é selecionado
-  // -----------------------------------------------------
   const handleEstoqueMinimo = () => {
-    setFiltroSelecionado('EstoqueMinimo');
+    setFiltroEstoqueMinimo(!filtroEstoqueMinimo);
   };
 
+  const handleLimparFiltro = () => {
+    setFiltroNomeProduto('');
+    setFiltroEstoqueMinimo(false);
+  };
 
-
-
-
-
-
-  // Responsável pela renderização dos itens na tela
-  // -----------------------------------------------
   const renderItem = ({ item }) => (
     <TouchableOpacity 
-      onPress={() => {
-        handleSelecionarProduto(item);
-      }}
+      onPress={() => handleSelecionarProduto(item)}
       style={[styles.item, { backgroundColor: item.id_produto === itemSelecionado ? '#aaa' : '#f9c2ff' }]}
     >
-      <View style={styles.item_Nome}>
-          <Text style={styles.nomeProduto1}>Nome:</Text>
-          <Text style={styles.nomeProduto2}>   {item.nome_produto}</Text>
-      </View>
-      <View style={styles.item_ID}>        
-          <Text style={styles.ID1}>ID:</Text>
-          <Text style={styles.ID2}>   {item.id_produto}</Text>
-      </View>
-      <View style={styles.item_estAtual}>
-          <Text style={styles.estoqueText2}>Estoque Atual:</Text>
-          <Text style={styles.estoqueText3}>   {item.estoque_atual}</Text>
-        </View>
-        <View style={styles.item_estSeguranca}>
-          <Text style={styles.estoqueText2}>Estoque Segurança:</Text>
-          <Text style={styles.estoqueText3}>   {item.estoque_seguranca}</Text>
-        </View>
-        <View style={styles.item_estMinimo}>
-          <Text style={styles.estoqueText2}>Estoque Mínimo:</Text>
-          <Text style={styles.estoqueText3}>   {item.estoque_minimo}</Text>
-        </View>
-      
+      <Text style={styles.nomeProduto}>Nome: {item.nome_produto}</Text>
+      <Text>ID: {item.id_produto}</Text>
+      <Text>Estoque Atual: {item.estoque_atual}</Text>
+      <Text>Estoque Mínimo: {item.estoque_minimo}</Text>
     </TouchableOpacity>
   );
 
-  // Retorno da função principal (ListarProdutosScreen)
-  // --------------------------------------------------
   return (
     <View style={styles.container}>
-      <View style={styles.opcoesContainer3}>
       <TouchableOpacity
-        style={[
-          styles.opcaoButton,
-          ordenacaoSelecionada === 'ID' ? styles.filtroSelecionado : null
-        ]}
-        onPress={() => handleOrdenarPor('ID')}
+        style={[styles.opcaoButton, filtroEstoqueMinimo ? styles.filtroSelecionado : null]}
+        onPress={handleEstoqueMinimo}
       >
-        <Text style={[styles.opcaoText, ordenacaoSelecionada === 'ID' ? styles.opcaoSelecionadaText : null]}>Ordenar por ID
+        <Text style={[styles.opcaoText, filtroEstoqueMinimo ? styles.opcaoSelecionadaText : null]}>
+          Estoque Mínimo ({totalEstoqueMinimo})
         </Text>
       </TouchableOpacity>
-      <TouchableOpacity
-        style={[
-          styles.opcaoButton,
-          ordenacaoSelecionada === 'Nome' ? styles.filtroSelecionado : null
-        ]}
-        onPress={() => handleOrdenarPor('Nome')}
-      >
-        <Text style={[styles.opcaoText, ordenacaoSelecionada === 'Nome' ? styles.opcaoSelecionadaText : null]}>Ordenar por Nome
-        </Text>
-      </TouchableOpacity>
-    </View>
-      <View style={styles.opcoesContainer1}>
+      <View style={styles.opcoesContainer}>
+        <TextInput
+          style={styles.inputText}
+          placeholder="Digite o nome do produto"
+          value={filtroNomeProduto}
+          onChangeText={(text) => setFiltroNomeProduto(text)}
+        />
         <TouchableOpacity
-          style={[styles.opcaoButton, filtroSelecionado === 'Todos' ? styles.filtroSelecionado : null]}
-          onPress={() => handleOpcaoSelecionada('Todos')}
+          style={styles.limparButton}
+          onPress={handleLimparFiltro}
         >
-          <Text style={[styles.opcaoText, filtroSelecionado === 'Todos' ? styles.opcaoSelecionadaText : null]}>Todos ({totalProdutos})
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.opcaoButton, filtroSelecionado === 'Bebida' ? styles.filtroSelecionado : null]}
-          onPress={() => handleOpcaoSelecionada('Bebida')}
-        >
-          <Text style={[styles.opcaoText, filtroSelecionado === 'Bebida' ? styles.opcaoSelecionadaText : null]}>Bebida ({totalBebidas})
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.opcaoButton, filtroSelecionado === 'Comida' ? styles.filtroSelecionado : null]}
-          onPress={() => handleOpcaoSelecionada('Comida')}
-        >
-          <Text style={[styles.opcaoText, filtroSelecionado === 'Comida' ? styles.opcaoSelecionadaText : null]}>Comida ({totalComidas})
-          </Text>
-        </TouchableOpacity>
-        </View>
-
-        <View style={styles.opcoesContainer2}>
-        <TouchableOpacity
-          style={[styles.opcaoButton, filtroSelecionado === 'EstoqueSeguranca' ? styles.filtroSelecionado : null]}
-          onPress={handleEstoqueSeguranca}
-        >
-          <Text style={[styles.opcaoText, filtroSelecionado === 'EstoqueSeguranca' ? styles.opcaoSelecionadaText : null]}>Estoque Segurança ({totalEstoqueSeguranca})
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.opcaoButton, filtroSelecionado === 'EstoqueMinimo' ? styles.filtroSelecionado : null]}
-          onPress={handleEstoqueMinimo}
-        >
-          <Text style={[styles.opcaoText, filtroSelecionado === 'EstoqueMinimo' ? styles.opcaoSelecionadaText : null]}>Estoque Mínimo ({totalEstoqueMinimo})
-          </Text>
+          <Text style={styles.limparButtonText}>Limpar</Text>
         </TouchableOpacity>
       </View>
 
-      
-
-
-      {/* É utilizada uma FlatList para listar os produtos */}
-      {/* ------------------------------------------------ */}
       <FlatList
         data={produtos}
         renderItem={renderItem}
-        keyExtractor={(item) => `produto_${item.id_produto.toString()}`}
+        keyExtractor={(item) => item.id_produto.toString()}
       />
+
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button1} onPress={handleAtualizarEstoque}>
           <Text style={styles.buttonText}>Atualizar Estoque</Text>
@@ -372,58 +182,94 @@ export default function ListarProdutos({ navigation }) {
         </TouchableOpacity>
       </View>
 
-      
-
     </View>
-    
   );
 }
 
-
-// Estilização
-// -----------
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    padding: 2,
+    paddingHorizontal: 10,
+    paddingTop: 10,
+  },
+  opcoesContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  opcaoButton: {
+    backgroundColor: '#fff',
+    borderRadius: 5,
+    paddingVertical: 5,
+    paddingHorizontal: 20,
+    height: 40,
+    marginBottom: 10,
+    alignItems: 'center',
+    borderWidth: 1,
+  },
+  opcaoText: {
+    color: '#3498db',
+    fontWeight: 'bold',
+    fontSize: 18,
+  },
+  opcaoSelecionadaText: {
+    color: '#fff',
+  },
+  inputText: {
+    flex: 1,
+    borderWidth: 2,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginRight: 10,
+    height: 40,
+  },
+  filtrarButton: {
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#3498db',
+    borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+  },
+  filtrarButtonText: {
+    color: '#3498db',
+    fontWeight: 'bold',
   },
   filtroSelecionado: {
     backgroundColor: '#3498db',
   },
-  opcaoSelecionadaText: {
-    color: '#fff', // Altera a cor do texto para branco
+  filtroSelecionadoText: {
+    color: '#fff',
   },
-  opcaoText: {
-    color: '#3498db',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  opcaoButton: {
-    paddingVertical: 4,
-    paddingHorizontal: 20,
+  limparButton: {
+    backgroundColor: '#fff',
     borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    height: 40,
     borderWidth: 1,
-    borderColor: '#3498db',
+  },
+  limparButtonText: {
+    color: '#3498db',
+    fontWeight: 'bold',
   },
   item: {
     backgroundColor: '#f9c2ff',
-    padding: 1,
-    marginVertical: 2,
-    marginHorizontal: 2,
+    padding: 20,
+    marginVertical: 8,
+    marginHorizontal: 16,
     borderRadius: 5,
   },
-  opcoesContainer1: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginVertical: 5,
+  nomeProduto: {
+    fontWeight: 'bold',
   },
-  opcoesContainer2: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginVertical: 5,
-  },
-
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
@@ -446,64 +292,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#fff',
-    fontSize: 16,
-  },
-  itemNome: {
-    padding: 10,
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-  },
-  itemID: {
-    flexDirection: 'row',
-  },
-  infoContainer: {
-    justifyContent: 'space-between',
-  },
-  nomeProduto1: {
     fontSize: 14,
-    fontWeight: 'bold',
-  },
-  nomeProduto2: {
-    fontSize: 14,
-    marginBottom: 1,
-  },
-  ID1: {
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  ID2: {
-    fontSize: 14,
-  },
-  estoqueText1: {
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  estoqueText2: {
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  estoqueText3: {
-    fontSize: 14,
-  },
-  item_Nome: {
-    flexDirection: 'row',
-  },
-  item_ID: {
-    flexDirection: 'row',
   },
 
-  item_estAtual: {
-    flexDirection: 'row',
-  },
-  item_estSeguranca: {
-    flexDirection: 'row',
-  },
-  item_estMinimo: {
-    flexDirection: 'row',
-  },
-  opcoesContainer3: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginVertical: 5,
-  },
 });

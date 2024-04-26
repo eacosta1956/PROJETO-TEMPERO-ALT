@@ -8,7 +8,7 @@ import ListarProdutos from './src/telas/ListarProdutos';
 import AtualizarEstoque from './src/telas/AtualizarEstoque';
 import ExcluirProduto from './src/telas/ExcluirProduto';
 import GerarRelatorios from './src/telas/GerarRelatorios';
-import ConsultarBanco from './src/telas/ConsultarBanco';
+import ConsultarBanco from './src/temp/ConsultarBanco';
 import { criaTabelas } from './src/database/CriaTabelas';
 
 // Configuração da navegação
@@ -40,6 +40,7 @@ export default function App() {
         <Stack.Screen name="ExcluirProduto" component={ExcluirProduto} />
         <Stack.Screen name="GerarRelatorios" component={GerarRelatorios} />
         <Stack.Screen name="ConsultarBanco" component={ConsultarBanco} />
+        
       </Stack.Navigator>
     </NavigationContainer>
   );

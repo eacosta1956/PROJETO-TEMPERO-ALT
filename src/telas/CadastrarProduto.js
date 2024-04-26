@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal, ScrollView, Button } from 'react-native';
 import { db } from '../database/AbreConexao'; // Importe o banco de dados SQLite
 
 
@@ -7,13 +7,14 @@ import { db } from '../database/AbreConexao'; // Importe o banco de dados SQLite
 // -----------------------------------------------------------------------------
 export default function CadastrarProduto({ navigation }) {
   const [descricaoProduto, setDescricaoProduto] = useState('');
-  const [estoqueSeguranca, setEstoqueSeguranca] = useState('');
   const [estoqueMinimo, setEstoqueMinimo] = useState('');
   const [tipoProduto, setTipoProduto] = useState('');
   const [bebidaSelected, setBebidaSelected] = useState(false);
   const [comidaSelected, setComidaSelected] = useState(false);
+  const [descartavelSelected, setDescartavelSelected] = useState(false);
   const [produtosEncontrados, setProdutosEncontrados] = useState([]);
-
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
 
   // Mostra na tela os produtos que contêm as letras do nome do produto digitados pelo usuário.
   // ------------------------------------------------------------------------------------------
@@ -27,7 +28,8 @@ export default function CadastrarProduto({ navigation }) {
           setProdutosEncontrados(produtos);
         },
         (_, error) => {
-          console.log('Erro ao buscar produtos:', error);
+          setModalMessage('Erro ao buscar produtos:', error);
+          setModalVisible(true);
         }
       );
     });
@@ -63,8 +65,9 @@ export default function CadastrarProduto({ navigation }) {
   // Acionada quando pressionado o botão Salvar Produto
   // --------------------------------------------------
   const salvarProduto = async () => {
-    if (!descricaoProduto || !estoqueSeguranca || !estoqueMinimo || !tipoProduto) {
-      Alert.alert('Atenção', 'Preencha todos os campos!');
+    if (!descricaoProduto || !estoqueMinimo || !tipoProduto) {
+      setModalMessage('Preencha todos os campos!');
+      setModalVisible(true);
       return;
     }
   
@@ -77,7 +80,8 @@ export default function CadastrarProduto({ navigation }) {
     try {
       const produtoDuplicado = await verificarDuplicata(descricaoUpperCase);
       if (produtoDuplicado) {
-        Alert.alert('Atenção', 'Este produto já está cadastrado!');
+        setModalMessage('Este produto já está cadastrado!');
+        setModalVisible(true);
         return;
       }
 
@@ -89,43 +93,71 @@ export default function CadastrarProduto({ navigation }) {
       // ---------------------------------------------
       db.transaction((transaction) => {
         transaction.executeSql(
-          `INSERT INTO produtos (nome_produto, estoque_seguranca, estoque_minimo, tipo_produto, data_cadastro) 
-          VALUES (?, ?, ?, ?, ?);`,
-          [descricaoUpperCase, parseInt(estoqueSeguranca), parseInt(estoqueMinimo), tipoProduto, dataAtual],
+          `INSERT INTO produtos (nome_produto, estoque_minimo, tipo_produto, data_cadastro) 
+          VALUES (?, ?, ?, ?);`,
+          [descricaoUpperCase, parseInt(estoqueMinimo), tipoProduto, dataAtual],
           (_, { insertId }) => {
 
-            // Após cadastrar o produto na tabela produtos, insire o id, o estoque e a data
+            // Após cadastrar o produto na tabela produtos, insere o id, o estoque e a data
             // na tabela estoque_atual
             // ----------------------------------------------------------------------------
             transaction.executeSql(
               `INSERT INTO estoque (id_produto, estoque_atual, data_atualizacao_estoque) VALUES (?, ?, ?);`,
               [insertId, 0, dataAtual], // Estoque atual inicialmente 0
               () => {
-                Alert.alert('Sucesso', 'Produto cadastrado com sucesso!');
+                setModalMessage('Produto cadastrado com sucesso!');
+                setModalVisible(true);
+
                 // Limpa os campos após o cadastro
                 // -------------------------------
                 setDescricaoProduto('');
-                setEstoqueSeguranca('');
                 setEstoqueMinimo('');
                 setTipoProduto('');
                 setBebidaSelected(false);
                 setComidaSelected(false);
+                setDescartavelSelected(false);
               },
               (_, error) => {
-                console.log('Erro ao inserir produto:', error);
-                Alert.alert('Erro', 'Erro ao cadastrar produto: ' + error);
+                setModalMessage('Erro ao inserir produto:', error);
+                setModalVisible(true);
               }
             );
           },
           (_, error) => {
-            Alert.alert('Erro', 'Erro ao cadastrar produto: ' + error);
+            setModalMessage('Erro ao cadastrar produto: ' + error);
+            setModalVisible(true);
           }
         );
       });
     } catch (error) {
-      Alert.alert('Erro', 'Erro ao verificar duplicata: ' + error);
+      setModalMessage('Erro ao verificar duplicata: ' + error);
+      setModalVisible(true);
     }
   };
+
+  const CustomModal = () => {
+    return (
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>{modalMessage}</Text>
+            <Button
+              title="OK"
+              onPress={() => {
+                setModalVisible(false);
+              }}
+            />
+          </View>
+        </View>
+      </Modal>
+    );
+  };
+
 
   // Retorno da função principal
   // ---------------------------
@@ -153,19 +185,11 @@ export default function CadastrarProduto({ navigation }) {
           style={styles.scrollView}>
           {produtosEncontrados.length > 0 && (
             produtosEncontrados.map((produto) => (
-              <Text key={produto.id}>{produto.nome_produto}</Text>
+              <Text key={produto.id_produto}>{produto.nome_produto}</Text>
             ))
           )}
         </ScrollView>
   
-        <TextInput
-          style={styles.input2}
-          placeholder="Estoque de segurança"
-          keyboardType="numeric"
-          value={estoqueSeguranca}
-          onChangeText={(text) => setEstoqueSeguranca(text)}
-        />
-
         <TextInput
           style={styles.input2}
           placeholder="Estoque mínimo"
@@ -179,10 +203,10 @@ export default function CadastrarProduto({ navigation }) {
           <TouchableOpacity
             style={[styles.radioButton, bebidaSelected ? styles.radioButtonSelected : null]}
             onPress={() => {
-              console.log('Botão Bebida pressionado');
               setTipoProduto('Bebida');
               setBebidaSelected(true);
               setComidaSelected(false);
+              setDescartavelSelected(false)
             }}  
           >
             <Text style={[styles.radioText, bebidaSelected ? styles.selectedText : null]}>Bebida</Text>
@@ -191,20 +215,36 @@ export default function CadastrarProduto({ navigation }) {
           <TouchableOpacity
             style={[styles.radioButton, comidaSelected ? styles.radioButtonSelected : null]}
             onPress={() => {
-              console.log('Botão Comida pressionado');
               setTipoProduto('Comida')
               setComidaSelected(true);
               setBebidaSelected(false);
+              setDescartavelSelected(false)
               }}
           >
             <Text style={[styles.radioText, comidaSelected ? styles.selectedText : null]}>Comida</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.radioButton, descartavelSelected ? styles.radioButtonSelected : null]}
+            onPress={() => {
+              setTipoProduto('Descartavel')
+              setDescartavelSelected(true)
+              setComidaSelected(false);
+              setBebidaSelected(false);
+              }}
+          >
+            <Text style={[styles.radioText, descartavelSelected ? styles.selectedText : null]}>Descartável</Text>
+          </TouchableOpacity>    
+
         </View>
 
         <TouchableOpacity style={styles.button} onPress={salvarProduto}>
           <Text style={styles.buttonText}>Salvar Produto</Text>
         </TouchableOpacity>
       </View>
+
+      <CustomModal />
+      
     </View>
   );
 }
@@ -251,18 +291,20 @@ const styles = StyleSheet.create({
   },
   radioContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
+    justifyContent: 'center',
+    width: 300,
     marginBottom: 10,
     marginTop: 10,
+    
   },
   radioButton: {
-    width: '45%',
+    width: 100,
     paddingVertical: 10,
     borderRadius: 5,
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#3498db',
+    marginRight:15,
   },
   radioButtonSelected: {
     backgroundColor: '#3498db',
@@ -288,5 +330,32 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    borderWidth: 1, // Adicionando uma borda
+    borderColor: '#aaa', // Cor da borda
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
   },
 });

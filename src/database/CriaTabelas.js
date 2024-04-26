@@ -11,12 +11,10 @@ export function criaTabelas() {
     db.transaction((transaction) => {
         transaction.executeSql(`CREATE TABLE IF NOT EXISTS produtos (
             id_produto INTEGER PRIMARY KEY AUTOINCREMENT,
-            nome_produto TEXT UNIQUE,
-            volume_ou_peso REAL,
+            nome_produto TEXT,
+            tipo_produto TEXT
             unidade_medida TEXT,
             data_cadastro TEXT,
-            tipo_produto TEXT,
-            estoque_seguranca INTEGER,
             estoque_minimo INTEGER
         );`,
         [],
@@ -24,7 +22,7 @@ export function criaTabelas() {
         (_, error) => console.log('Erro ao criar tabela produtos: ' + error)
         );
     });
-
+ 
     // Cria a tabela entrada_saida
     // ---------------------------
     db.transaction(transaction => {
@@ -60,54 +58,6 @@ export function criaTabelas() {
 };
 
 /*
-    // exclui tabelas
-    // --------------
-    // Abre o banco de dados
-    const db = SQLite.openDatabase('ControlEstoque3.db');
-
-    // Função para excluir as tabelas
-    const excluirTabelas = () => {
-    db.transaction((transaction) => {
-        transaction.executeSql(
-        "DROP TABLE IF EXISTS nova_tabela;",
-        [],
-        (_, { rowsAffected }) => {
-            console.log(`Tabela 'nova_tabela' excluída com sucesso. Linhas afetadas: ${rowsAffected}`);
-        },
-        (_, error) => {
-            console.log('Erro ao excluir tabela nova_tabela:', error);
-        }
-        );
-
-        transaction.executeSql(
-        "DROP TABLE IF EXISTS tabelaestoque;",
-        [],
-        (_, { rowsAffected }) => {
-            console.log(`Tabela 'tabelaestoque' excluída com sucesso. Linhas afetadas: ${rowsAffected}`);
-        },
-        (_, error) => {
-            console.log('Erro ao excluir tabela tabelaestoque:', error);
-        }
-        );
-
-        transaction.executeSql(
-        "DROP TABLE IF EXISTS estoque_atual;",
-        [],
-        (_, { rowsAffected }) => {
-            console.log(`Tabela 'estoque_atual' excluída com sucesso. Linhas afetadas: ${rowsAffected}`);
-        },
-        (_, error) => {
-            console.log('Erro ao excluir tabela estoque_atual:', error);
-        }
-        );
-    });
-    };
-    // Chamada da função para excluir as tabelas
-    excluirTabelas();
-*/
-
-
-/*
     // Mostra a estrutura de uma tabela
     // --------------------------------
     db.transaction((transaction) => {
@@ -127,9 +77,9 @@ export function criaTabelas() {
         }
         );
     });
-    //*/  
+*/  
 
-    /*
+/*
     // Mostrar tabelas criadas
     // -----------------------
     db.transaction((transaction) => {
@@ -151,5 +101,5 @@ export function criaTabelas() {
           }
         );
       });
-      */
+*/
       

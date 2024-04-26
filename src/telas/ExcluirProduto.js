@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Alert, Modal, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, Modal, StyleSheet, Button } from 'react-native';
 import { db } from '../database/AbreConexao';
 
 
@@ -7,7 +7,11 @@ import { db } from '../database/AbreConexao';
 // ----------------
 export default function ExcluirProduto({ route, navigation }) {
   const [produto, setProduto] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);  
+  const [modalMessage, setModalMessage] = useState('');
+  const [confirmModalVisible, setConfirmModalVisible] = useState(false);
+  const [modalType, setModalType] = useState(null);
+  const [operacaoSucesso, setOperacaoSucesso] = useState(false);
 
 
   // É um Hook. Acionado quando a tela ExcluirProduto é carregada
@@ -16,21 +20,22 @@ export default function ExcluirProduto({ route, navigation }) {
     // Obtém o produto passado pela navegação
     if (route.params && route.params.produto) {
       setProduto(route.params.produto);
-      console.log("id do produto: ", route.params.produto.id_produto)
+      //console.log("id do produto: ", route.params.produto.id_produto)
     }
   }, [route.params]);
     
   // Acionada quando o botão Excluir produto é pressionado. Carrega um modal.
   // -----------------------------------------------------------------------
   const confirmarExclusao = () => {
-    setModalVisible(true);
+    setModalType('confirm');
   };
 
   // Acionada quando o usuário confirma, no modal, a exclusão do produto
   // -------------------------------------------------------------------
   const excluirProduto = () => {
     if (!produto) {
-      Alert.alert('Erro', 'Produto não encontrado.');
+      setModalMessage('Produto não encontrado.');
+      setModalType(null);
       return;
     }
 
@@ -50,26 +55,56 @@ export default function ExcluirProduto({ route, navigation }) {
               [produto.id_produto],
               (_, { rowsAffected: rowsAffectedEstoque }) => {
                 if (rowsAffectedEstoque > 0) {
-                  Alert.alert('Sucesso', 'Produto excluído com sucesso!');
-                  setModalVisible(false);
-                  navigation.goBack(); // Volta para a tela anterior
+                  setModalMessage('Produto excluído com sucesso!');
+                  setModalType('message');
+                  setOperacaoSucesso(true);
                 } else {
-                  Alert.alert('Erro', 'Erro ao excluir produto do estoque.');
+                  setModalMessage('Erro ao excluir produto do estoque.');
+                  setModalType('message');
                 }
               },
               (_, error) => {
-                Alert.alert('Erro', 'Erro ao excluir produto do estoque atual: ' + error);
+                setModalMessage('Erro ao excluir produto do estoque atual: ' + error);
+                setModalType('message');
               }
             ); 
           } else {
-            Alert.alert('Erro', 'Erro ao excluir produto.');
+            setModalMessage('Erro ao excluir produto.');
+            setModalType('message');
           }
         },
         (_, error) => {
-          Alert.alert('Erro', 'Erro ao excluir produto: ' + error);
+          setModalMessage('Erro ao excluir produto: ' + error);
+          setModalType('message');
         }
       );
     });
+  };
+
+  const CustomModal = () => {
+    return (
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalType === 'message'}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>{modalMessage}</Text>
+            <Button
+            title="OK"
+            onPress={() => {
+              setModalVisible(false);
+            if (operacaoSucesso) {
+              navigation.navigate('ListarProdutos');
+            }
+            }}
+            />
+          </View>
+        </View>
+      </Modal>
+    );
   };
 
   // Retorno da função principal
@@ -82,7 +117,6 @@ export default function ExcluirProduto({ route, navigation }) {
             <Text>Nome do Produto: {produto.nome_produto}</Text>
             <Text>ID do Produto: {produto.id_produto}</Text>
             <Text>Estoque Atual: {produto.estoque_atual}</Text>
-            <Text>Estoque Segurança: {produto.estoque_seguranca}</Text>
             <Text>Estoque Mínimo: {produto.estoque_minimo}</Text>
           </>
         )}
@@ -92,11 +126,12 @@ export default function ExcluirProduto({ route, navigation }) {
         <Text style={styles.buttonText}>Excluir Produto</Text>
       </TouchableOpacity>
 
+
       <Modal
         animationType="slide"
         transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
+        visible={modalType === 'confirm'}
+        onRequestClose={() => setConfirmModalVisible(false)}
       >
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
@@ -109,7 +144,7 @@ export default function ExcluirProduto({ route, navigation }) {
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.buttonModal, styles.buttonModalCancel]}
-                onPress={() => setModalVisible(false)}
+                onPress={() => setModalType(null)}
               >
                 <Text style={styles.buttonText}>Cancelar</Text>
               </TouchableOpacity>
@@ -117,9 +152,13 @@ export default function ExcluirProduto({ route, navigation }) {
           </View>
         </View>
       </Modal>
+
+      <CustomModal />
+
     </View>
   );
 }
+
 
 
 // Estilização
@@ -130,14 +169,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#fff',
-  },
-  input: {
-    width: '80%',
-    marginBottom: 10,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
   },
   button: {
     width: '80%',
