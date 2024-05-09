@@ -19,9 +19,6 @@ export default function Home({ navigation }) {
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('GerarRelatorios')}>
         <Text style={styles.buttonText}>Gerar Relatórios</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ConsultarBanco')}>
-        <Text style={styles.buttonText}>Consultar Banco</Text>
-      </TouchableOpacity>
 
     </View>
   );
@@ -42,7 +39,7 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: '#3498db',
     borderRadius: 5,
-    width: 180,
+    width: 360,
   },
   buttonText: {
     color: '#fff',

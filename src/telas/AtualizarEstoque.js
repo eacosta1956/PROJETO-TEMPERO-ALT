@@ -2,9 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal, Button  } from 'react-native';
 import { db } from '../database/AbreConexao';
 
-
 // Função principal - Atualizar o estoque dos produtos
-// ---------------------------------------------------
 export default function AtualizarEstoque({ route, navigation }) {
   const [produto, setProduto] = useState(null);
   const [quantidade, setQuantidade] = useState('');
@@ -12,63 +10,41 @@ export default function AtualizarEstoque({ route, navigation }) {
   const [modalMessage, setModalMessage] = useState('');
   const [operacaoSucesso, setOperacaoSucesso] = useState(false);
 
-
-  // É um Hook. Acionado quando a tela AtualizarEstoque é carregada
-  // --------------------------------------------------------------
   useEffect(() => {
-    // Obtém o produto passado pela navegação
     if (route.params && route.params.produto) {
       setProduto(route.params.produto);
       setQuantidade('');
     }
   }, [route.params]);
 
-  // Acionada quando pressionados os botões Adicionar ou Retirar
-  // -----------------------------------------------------------
   const salvarMovimentacaoEstoque = (operacao) => {
+    const currentDate = new Date();
+    const formattedDateTime = currentDate.toLocaleDateString('pt-BR') + ' ' + currentDate.toLocaleTimeString('pt-BR');
 
-    // Obtém a data e hora atual no formato desejado (Brasil/São Paulo)
-    // ----------------------------------------------------------------
-    const dataAtual = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
-
-    // Converte a quantidade a ser adicionada ao estoque para número inteiro
-    // ---------------------------------------------------------------------
     const qtdInt = parseInt(quantidade);
-
-    // Verifica se a quantidade a ser retirada é maior que o estoque. Se for, aborta a operação
-    // ----------------------------------------------------------------------------------------
     if (operacao === 'retirar' && qtdInt > produto.estoque_atual) {
       setModalMessage('Quantidade a retirar maior que o estoque atual!');
       setModalVisible(true);
-      setQuantidade(null)
+      setQuantidade(null);
       return;
     }
 
-    // Verifica se a operação é de adição ou de retirada
-    // -------------------------------------------------
     const qtdMovimentada = operacao === 'adicionar' ? qtdInt : -qtdInt;
     
-    // Atualiza o novo estoque na tabela estoque
-    // -----------------------------------------
     db.transaction((transaction) => {
       transaction.executeSql(
         `UPDATE estoque
         SET estoque_atual = estoque_atual + ?, data_atualizacao_estoque = ? 
         WHERE id_produto = ?;`,
-        [qtdMovimentada, dataAtual, produto.id_produto],
+        [qtdMovimentada, formattedDateTime, produto.id_produto],
         
         (_, { rowsAffected }) => {
           if (rowsAffected > 0) {
+            atualizarProdutoSelecionado(produto.id_produto);
 
-              // Chama a função para atualizar o estado do produto selecionado
-              // -------------------------------------------------------------
-              atualizarProdutoSelecionado(produto.id_produto);
-
-            // Insere a movimentação na tabela entrada_saida
-            // ---------------------------------------------
             transaction.executeSql(
               `INSERT INTO entrada_saida (id_produto, quantidade, data_atualizacao, estoque_atual) VALUES (?, ?, ?, ?);`,
-              [produto.id_produto, qtdMovimentada, dataAtual,qtdMovimentada + produto.estoque_atual],
+              [produto.id_produto, qtdMovimentada, formattedDateTime, qtdMovimentada + produto.estoque_atual],
               () => {
                 setModalMessage('Movimentação de estoque realizada com sucesso!');
                 setOperacaoSucesso(true);
@@ -76,27 +52,23 @@ export default function AtualizarEstoque({ route, navigation }) {
                 setQuantidade('');
               },
               (_, error) => {
-                //setModalMessage('Erro', 'Erro ao salvar movimentação de estoque: ' + error);
-                //setModalVisible(true);
+                setModalMessage('Erro ao salvar movimentação de estoque: ' + error);
+                setModalVisible(true);
               }
             );
           } else {
-            //setModalMessage('Erro', 'Produto não encontrado ou erro ao atualizar estoque.');
-            //setModalVisible(true);
+            setModalMessage('Produto não encontrado ou erro ao atualizar estoque.');
+            setModalVisible(true);
           }
         },
         (_, error) => {
-          //setModalMessage('Erro', 'Erro ao atualizar estoque: ' + error);
-          //setModalVisible(true);
+          setModalMessage('Erro ao atualizar estoque: ' + error);
+          setModalVisible(true);
         }
       );
     });
   };
-  // Fim da função responsável pela atualização do estoque
 
-
-  // Atualiza o estado do produto selecionado. É chamada de dentro da função anterior.
-  // ---------------------------------------------------------------------------------
   const atualizarProdutoSelecionado = (id_produto) => {
     db.transaction((transaction) => {
       transaction.executeSql(
@@ -104,11 +76,10 @@ export default function AtualizarEstoque({ route, navigation }) {
         [id_produto],
         (_, { rows }) => {
           const produtoAtualizado = rows._array[0];
-          setProduto(produtoAtualizado); // Atualiza o estado do produto
+          setProduto(produtoAtualizado);
         },
         (_, error) => {
-          //setModalMessage('Erro', 'Erro ao buscar produto atualizado: ' + error);
-          //setModalVisible(true);
+          // Tratamento de erro
         }
       );
     });
@@ -129,9 +100,9 @@ export default function AtualizarEstoque({ route, navigation }) {
               title="OK"
               onPress={() => {
                 setModalVisible(false);
-              if (operacaoSucesso) {
-                navigation.navigate('ListarProdutos');
-              }
+                if (operacaoSucesso) {
+                  navigation.navigate('ListarProdutos');
+                }
               }}
             />
           </View>
@@ -139,14 +110,9 @@ export default function AtualizarEstoque({ route, navigation }) {
       </Modal>
     );
   };
-  
 
-
-  // Retorno da função principal
-  // ---------------------------
   return (
     <View style={styles.container}>
-      
       <View>
         {produto && (
           <>
@@ -186,8 +152,6 @@ export default function AtualizarEstoque({ route, navigation }) {
   );
 }
 
-// Estilização
-// -----------
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -225,8 +189,8 @@ const styles = StyleSheet.create({
     margin: 20,
     backgroundColor: 'white',
     borderRadius: 20,
-    borderWidth: 1, // Adicionando uma borda
-    borderColor: '#aaa', // Cor da borda
+    borderWidth: 1,
+    borderColor: '#aaa',
     padding: 35,
     alignItems: 'center',
     shadowColor: '#000',

@@ -2,9 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal, ScrollView, Button } from 'react-native';
 import { db } from '../database/AbreConexao'; // Importe o banco de dados SQLite
 
-
 // Função principal - Cadastrar os produtos na tabela produtos do banco de dados
-// -----------------------------------------------------------------------------
 export default function CadastrarProduto({ navigation }) {
   const [descricaoProduto, setDescricaoProduto] = useState('');
   const [estoqueMinimo, setEstoqueMinimo] = useState('');
@@ -16,13 +14,11 @@ export default function CadastrarProduto({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
 
-  // Mostra na tela os produtos que contêm as letras do nome do produto digitados pelo usuário.
-  // ------------------------------------------------------------------------------------------
   const buscarProdutos = (texto) => {
     db.transaction((transaction) => {
       transaction.executeSql(
         `SELECT * FROM produtos WHERE nome_produto LIKE ?`,
-        [`%${texto}%`], // Use % para buscar produtos que contenham o texto em qualquer posição
+        [`%${texto}%`],
         (_, { rows }) => {
           const produtos = rows._array;
           setProdutosEncontrados(produtos);
@@ -35,8 +31,6 @@ export default function CadastrarProduto({ navigation }) {
     });
   };
   
-  // Verifica se há um registro com o mesmo nome já cadastrado
-  // ---------------------------------------------------------
   const verificarDuplicata = (nomeProduto) => {
     return new Promise((resolve, reject) => {
       db.transaction((transaction) => {
@@ -46,10 +40,8 @@ export default function CadastrarProduto({ navigation }) {
           (_, { rows }) => {
             const { count } = rows.item(0);
             if (count > 0) {
-              // Produto duplicado encontrado
               resolve(true);
             } else {
-              // Produto não duplicado
               resolve(false);
             }
           },
@@ -62,21 +54,15 @@ export default function CadastrarProduto({ navigation }) {
     });
   };
   
-  // Acionada quando pressionado o botão Salvar Produto
-  // --------------------------------------------------
   const salvarProduto = async () => {
     if (!descricaoProduto || !estoqueMinimo || !tipoProduto) {
       setModalMessage('Preencha todos os campos!');
       setModalVisible(true);
       return;
     }
-  
-    // Converte a descrição do produto para letras maiúsculas
-    // ------------------------------------------------------
+
     const descricaoUpperCase = descricaoProduto.toUpperCase();
 
-    // Aborta a operação de cadastrar o produto, caso haja no cadastro produto com o mesmo nome
-    // ----------------------------------------------------------------------------------------
     try {
       const produtoDuplicado = await verificarDuplicata(descricaoUpperCase);
       if (produtoDuplicado) {
@@ -85,31 +71,21 @@ export default function CadastrarProduto({ navigation }) {
         return;
       }
 
-      // Obtém a data e hora atual no formato desejado (Brasil/São Paulo)
-      // ----------------------------------------------------------------
-      const dataAtual = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+      const currentDate = new Date();
+      const formattedDateTime = currentDate.toLocaleDateString('pt-BR') + ' ' + currentDate.toLocaleTimeString('pt-BR');
 
-      // Insere os dados do produto na tabela produtos
-      // ---------------------------------------------
       db.transaction((transaction) => {
         transaction.executeSql(
           `INSERT INTO produtos (nome_produto, estoque_minimo, tipo_produto, data_cadastro) 
           VALUES (?, ?, ?, ?);`,
-          [descricaoUpperCase, parseInt(estoqueMinimo), tipoProduto, dataAtual],
+          [descricaoUpperCase, parseInt(estoqueMinimo), tipoProduto, formattedDateTime],
           (_, { insertId }) => {
-
-            // Após cadastrar o produto na tabela produtos, insere o id, o estoque e a data
-            // na tabela estoque_atual
-            // ----------------------------------------------------------------------------
             transaction.executeSql(
               `INSERT INTO estoque (id_produto, estoque_atual, data_atualizacao_estoque) VALUES (?, ?, ?);`,
-              [insertId, 0, dataAtual], // Estoque atual inicialmente 0
+              [insertId, 0, formattedDateTime],
               () => {
                 setModalMessage('Produto cadastrado com sucesso!');
                 setModalVisible(true);
-
-                // Limpa os campos após o cadastro
-                // -------------------------------
                 setDescricaoProduto('');
                 setEstoqueMinimo('');
                 setTipoProduto('');
@@ -158,31 +134,24 @@ export default function CadastrarProduto({ navigation }) {
     );
   };
 
-
-  // Retorno da função principal
-  // ---------------------------
   return (
     <View style={styles.container}>
-
-        <TextInput
-          style={styles.input1}
-          placeholder="Descrição do produto"
-          value={descricaoProduto}
-          onChangeText={(text) => {
-            setDescricaoProduto(text);
-            if (text.trim() === '') {
-            // Se o texto estiver vazio, limpar a lista de produtos
-              setProdutosEncontrados([]);
-            } else {
-              buscarProdutos(text); // Chama a função ao digitar
-            }
-          }}
-        />
-
+      <TextInput
+        style={styles.input1}
+        placeholder="Descrição do produto"
+        value={descricaoProduto}
+        onChangeText={(text) => {
+          setDescricaoProduto(text);
+          if (text.trim() === '') {
+            setProdutosEncontrados([]);
+          } else {
+            buscarProdutos(text);
+          }
+        }}
+      />
 
       <View style={styles.contentContainer}>  
-        <ScrollView 
-          style={styles.scrollView}>
+        <ScrollView style={styles.scrollView}>
           {produtosEncontrados.length > 0 && (
             produtosEncontrados.map((produto) => (
               <Text key={produto.id_produto}>{produto.nome_produto}</Text>
@@ -198,7 +167,6 @@ export default function CadastrarProduto({ navigation }) {
           onChangeText={(text) => setEstoqueMinimo(text)}
         />
 
-        {/* Botões de opção tipo rádio para selecionar o tipo de produto */}
         <View style={styles.radioContainer}>
           <TouchableOpacity
             style={[styles.radioButton, bebidaSelected ? styles.radioButtonSelected : null]}
@@ -235,7 +203,6 @@ export default function CadastrarProduto({ navigation }) {
           >
             <Text style={[styles.radioText, descartavelSelected ? styles.selectedText : null]}>Descartável</Text>
           </TouchableOpacity>    
-
         </View>
 
         <TouchableOpacity style={styles.button} onPress={salvarProduto}>
@@ -249,8 +216,6 @@ export default function CadastrarProduto({ navigation }) {
   );
 }
 
-// Estilização
-// -----------
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -281,7 +246,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   scrollView: {
-    maxHeight: 150, // Altura máxima da ScrollView
+    maxHeight: 150,
     minHeight: 130,
     borderWidth: 1,
     borderColor: '#ccc',
@@ -295,7 +260,6 @@ const styles = StyleSheet.create({
     width: 300,
     marginBottom: 10,
     marginTop: 10,
-    
   },
   radioButton: {
     width: 100,
@@ -304,7 +268,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#3498db',
-    marginRight:15,
+    marginRight: 15,
   },
   radioButtonSelected: {
     backgroundColor: '#3498db',
@@ -315,7 +279,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   selectedText: {
-    color: '#fff', // Cor branca para texto selecionado
+    color: '#fff',
   },
   button: {
     width: '100%',
@@ -341,8 +305,8 @@ const styles = StyleSheet.create({
     margin: 20,
     backgroundColor: 'white',
     borderRadius: 20,
-    borderWidth: 1, // Adicionando uma borda
-    borderColor: '#aaa', // Cor da borda
+    borderWidth: 1,
+    borderColor: '#aaa',
     padding: 35,
     alignItems: 'center',
     shadowColor: '#000',

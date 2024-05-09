@@ -3,6 +3,7 @@ import { View, Text, FlatList, StyleSheet, TouchableOpacity, TextInput } from 'r
 import { useFocusEffect } from '@react-navigation/native';
 import { db } from '../database/AbreConexao';
 
+
 export default function ListarProdutos({ navigation }) {
   const [produtos, setProdutos] = useState([]);
   const [produtoSelecionado, setProdutoSelecionado] = useState(null);

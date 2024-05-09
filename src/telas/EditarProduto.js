@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal, Button } from 'react-native';
 import { db } from '../database/AbreConexao';
 
-// Função principal
-// ----------------
 export default function EditarProduto({ route, navigation }) {
   const [produto, setProduto] = useState(null);
   const [nomeProduto, setNomeProduto] = useState('');
@@ -17,10 +15,7 @@ export default function EditarProduto({ route, navigation }) {
   const [modalMessage, setModalMessage] = useState('');
   const [operacaoSucesso, setOperacaoSucesso] = useState(false);
 
-  // Atualiza os estados com os dados do produto ao carregar a tela
-  // --------------------------------------------------------------
   useEffect(() => {
-    // Obtém o produto passado pela navegação
     if (route.params && route.params.produto) {
       setProduto(route.params.produto);
     }
@@ -28,9 +23,6 @@ export default function EditarProduto({ route, navigation }) {
     carregaQuantidadeUltimaOperacao();
   }, [route.params]);
 
-  // Carrega os dados de cadastro dos produtos da tabela produtos
-  // sempre que a tela for carregada e atualiza o status das variáveis
-  // -----------------------------------------------------------------
   const carregaInformacoesProduto = () => {
     db.transaction((transaction) => {
       transaction.executeSql(
@@ -43,16 +35,13 @@ export default function EditarProduto({ route, navigation }) {
           setEstoqueMinimo(String(produto.estoque_minimo));
         },
         (_, error) => {
-            setModalMessage('Erro ao carregar informações do produto:', error);
-            setModalVisible(true);
+          setModalMessage('Erro ao carregar informações do produto:', error);
+          setModalVisible(true);
         }
       );
     });
   };
 
-  // Carrega a quantidade da última atualização de estoque ocorrida com 
-  // o produto em tela e atualiza o status da variável
-  // ------------------------------------------------------------------
   const carregaQuantidadeUltimaOperacao = () => {
     db.transaction(transaction => {
         transaction.executeSql(
@@ -74,16 +63,10 @@ export default function EditarProduto({ route, navigation }) {
     });
   };
   
-
-  // Função para salvar as alterações no banco de dados
-  // --------------------------------------------------
   const salvarAlteracoes = () => {
-    // Converte a descrição e o tipo do produto para letras maiúsculas
     const nomeProdutoUpperCase = nomeProduto.toUpperCase();
     const tipoProdutoUpperCase = tipoProduto.toUpperCase();
 
-  
-    // Abre a transação para realizar a atualização no banco de dados
     db.transaction((transaction) => {
       transaction.executeSql(
         `UPDATE produtos 
@@ -93,10 +76,6 @@ export default function EditarProduto({ route, navigation }) {
         WHERE id_produto = ?;`,
         [nomeProdutoUpperCase, tipoProdutoUpperCase, parseInt(estoqueMinimo), route.params.produto.id_produto],
         (_, result) => {
-          //setModalMessage(`Produto atualizado com sucesso. Linhas afetadas: ${result.rowsAffected}`);
-          //setModalVisible(true);
-  
-          // Verifica se a quantidade da nova atualização não está vazia
           if (quantidadeNovaAtualizacao.trim() !== '') {
             const quantidadeAntiga = parseFloat(quantidadeUltimaAtualizacao);
             const novaQuantidade = parseFloat(quantidadeNovaAtualizacao);
@@ -109,43 +88,33 @@ export default function EditarProduto({ route, navigation }) {
               WHERE id_produto = ? AND data_atualizacao = ?;`,
               [quantidadeNovaAtualizacao, diferenca, route.params.produto.id_produto, dataAtualizacaoEstoque],
               (_, result) => {
-                //setModalMessage(`Atualizações na entrada_saida concluídas com sucesso. Linhas afetadas: ${result.rowsAffected}`);
-                //setModalVisible(true);
-  
-                // Continua com as demais atualizações no banco de dados
                 transaction.executeSql(
                   `UPDATE estoque
                   SET estoque_atual = estoque_atual + ?
                   WHERE id_produto = ?;`,
                   [diferenca, route.params.produto.id_produto],
                   (_, result) => {
-                    //setModalMessage(`Atualização no estoque concluída com sucesso. Linhas afetadas: ${result.rowsAffected}`);
-                    //setModalVisible(true);
+                    // Atualizações concluídas
                   },
                   (_, error) => {
-                    //setModalMessage('Erro ao atualizar estoque: ' + error.message);
-                    //setModalVisible(true);
+                    // Erro na atualização do estoque
                   }
                 );
               },
               (_, error) => {
-                //setModalMessage('Erro ao atualizar entrada_saida: ' + error.message);
-                //setModalVisible(true);
+                // Erro na atualização da entrada_saida
               }
             );
           } else {
-            //setModalMessage('A quantidade da nova atualização está vazia. Não foi realizada atualização na tabela entrada_saida.');
-            //setModalVisible(true);
+            // A quantidade da nova atualização está vazia
           }
         },
         (_, error) => {
-          //setModalMessage('Erro ao atualizar produtos: ' + error.message);
-          //setModalVisible(true);
+          // Erro na atualização de produtos
         }
       );
     }, (error) => {
-      //setModalMessage('Erro na transação: ' + error.message);
-      //setModalVisible(true);
+      // Erro na transação
     }, () => {
       setModalMessage('Transação concluída com sucesso.');
       setOperacaoSucesso(true);
@@ -168,9 +137,9 @@ export default function EditarProduto({ route, navigation }) {
               title="OK"
               onPress={() => {
                 setModalVisible(false);
-              if (operacaoSucesso) {
-                navigation.navigate('ListarProdutos');
-              }
+                if (operacaoSucesso) {
+                  navigation.navigate('ListarProdutos');
+                }
               }}
             />
           </View>
@@ -179,75 +148,70 @@ export default function EditarProduto({ route, navigation }) {
     );
   };
 
-return (
-  <View style={styles.container}>
-    <View style={styles.infoContainer}>
+  return (
+    <View style={styles.container}>
+      <View style={styles.infoContainer}>
+        <View style={styles.infoRow}>
+          <Text style={styles.label}>ID do Produto:</Text>
+          <Text style={styles.text}>{route.params.produto.id_produto}</Text>
+        </View>
+
+        <View style={styles.infoRow}>
+          <Text style={styles.label}>Estoque Atual:</Text>
+          <Text style={styles.text}>{estoqueProduto}</Text>
+        </View>
+
+        <View style={styles.infoRow}>
+          <Text style={styles.label}>Quantidade da Última Atualização:</Text>
+          <Text style={styles.text}>{quantidadeUltimaAtualizacao}</Text>
+        </View>
+
+        <View style={styles.infoRow}>
+          <Text style={styles.label}>Data da Última Atualização:</Text>
+          <Text style={styles.text}>{dataAtualizacaoEstoque}</Text>
+        </View>
+      </View>
       
-      <View style={styles.infoRow}>
-        <Text style={styles.label}>ID do Produto:</Text>
-        <Text style={styles.text}>{route.params.produto.id_produto}</Text>
-      </View>
+      <Text style={styles.label}>Nome do Produto:</Text>
+      <TextInput
+        style={styles.input}
+        onChangeText={setNomeProduto}
+        value={nomeProduto}
+      />
+      
+      <Text style={styles.label}>Tipo do Produto:</Text>
+      <TextInput
+        style={styles.input}
+        onChangeText={setTipoProduto}
+        value={tipoProduto}
+      />
+      
+      <Text style={styles.label}>Estoque Mínimo:</Text>
+      <TextInput
+        style={styles.input}
+        onChangeText={setEstoqueMinimo}
+        value={estoqueMinimo}
+        keyboardType="numeric"
+      />
+      
+      <Text style={styles.label}>Quantidade da Nova Atualização:</Text>
+      <TextInput
+        style={styles.input}
+        onChangeText={setQuantidadeNovaAtualizacao}
+        value={quantidadeNovaAtualizacao}
+        keyboardType="numeric"
+      />
+      
+      <TouchableOpacity 
+        style={styles.button}
+        onPress={salvarAlteracoes}>
+        <Text style={styles.buttonText}>Salvar Alterações</Text>
+      </TouchableOpacity>
 
-      <View style={styles.infoRow}>
-        <Text style={styles.label}>Estoque Atual:</Text>
-        <Text style={styles.text}>{estoqueProduto}</Text>
-      </View>
-
-      <View style={styles.infoRow}>
-        <Text style={styles.label}>Quantidade da Última Atualização:</Text>
-        <Text style={styles.text}>{quantidadeUltimaAtualizacao}</Text>
-      </View>
-
-      <View style={styles.infoRow}>
-        <Text style={styles.label}>Data da Última Atualização:</Text>
-        <Text style={styles.text}>{dataAtualizacaoEstoque}</Text>
-      </View>
+      <CustomModal />
     </View>
-    
-    <Text style={styles.label}>Nome do Produto:</Text>
-    <TextInput
-      style={styles.input}
-      onChangeText={setNomeProduto}
-      value={nomeProduto}
-    />
-    
-    <Text style={styles.label}>Tipo do Produto:</Text>
-    <TextInput
-      style={styles.input}
-      onChangeText={setTipoProduto}
-      value={tipoProduto}
-    />
-    
-    <Text style={styles.label}>Estoque Mínimo:</Text>
-    <TextInput
-      style={styles.input}
-      onChangeText={setEstoqueMinimo}
-      value={estoqueMinimo}
-      keyboardType="numeric"
-    />
-    
-    <Text style={styles.label}>Quantidade da Nova Atualização:</Text>
-    <TextInput
-      style={styles.input}
-      onChangeText={setQuantidadeNovaAtualizacao}
-      value={quantidadeNovaAtualizacao}
-      keyboardType="numeric"
-    />
-    
-    <TouchableOpacity 
-      style={styles.button}
-      onPress={salvarAlteracoes}>
-      <Text style={styles.buttonText}>Salvar Alterações</Text>
-    </TouchableOpacity>
-
-    <CustomModal />
-
-  </View>
-);
-
-
+  );
 }
-
 
 const styles = StyleSheet.create({
   container: {
@@ -299,8 +263,8 @@ const styles = StyleSheet.create({
     margin: 20,
     backgroundColor: 'white',
     borderRadius: 20,
-    borderWidth: 1, // Adicionando uma borda
-    borderColor: '#aaa', // Cor da borda
+    borderWidth: 1,
+    borderColor: '#aaa',
     padding: 35,
     alignItems: 'center',
     shadowColor: '#000',

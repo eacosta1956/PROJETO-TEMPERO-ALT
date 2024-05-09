@@ -41,7 +41,7 @@ export function criaTabelas() {
     });
 
      // Cria a tabela estoque
-     // ---------------------------
+     // ---------------------
      db.transaction(transaction => {
         transaction.executeSql(`CREATE TABLE IF NOT EXISTS estoque (
             id INTEGER PRIMARY KEY AUTOINCREMENT,

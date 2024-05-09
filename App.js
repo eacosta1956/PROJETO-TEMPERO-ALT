@@ -2,14 +2,14 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Home from './src/telas/Home';
+import { criaTabelas } from './src/database/CriaTabelas';
+
+import AtualizarEstoque from './src/telas/AtualizarEstoque';
 import CadastrarProduto from './src/telas/CadastrarProduto';
 import EditarProduto from './src/telas/EditarProduto';
-import ListarProdutos from './src/telas/ListarProdutos';
-import AtualizarEstoque from './src/telas/AtualizarEstoque';
 import ExcluirProduto from './src/telas/ExcluirProduto';
 import GerarRelatorios from './src/telas/GerarRelatorios';
-import ConsultarBanco from './src/temp/ConsultarBanco';
-import { criaTabelas } from './src/database/CriaTabelas';
+import ListarProdutos from './src/telas/ListarProdutos';
 
 // Configuração da navegação
 // -------------------------
@@ -33,14 +33,12 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Home">
         <Stack.Screen name="Home" component={Home} />
+        <Stack.Screen name="AtualizarEstoque" component={AtualizarEstoque} />
         <Stack.Screen name="CadastrarProduto" component={CadastrarProduto} />
         <Stack.Screen name="EditarProduto" component={EditarProduto} />
-        <Stack.Screen name="ListarProdutos" component={ListarProdutos} />
-        <Stack.Screen name="AtualizarEstoque" component={AtualizarEstoque} />
         <Stack.Screen name="ExcluirProduto" component={ExcluirProduto} />
         <Stack.Screen name="GerarRelatorios" component={GerarRelatorios} />
-        <Stack.Screen name="ConsultarBanco" component={ConsultarBanco} />
-        
+        <Stack.Screen name="ListarProdutos" component={ListarProdutos} />
       </Stack.Navigator>
     </NavigationContainer>
   );
