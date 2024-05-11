@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import styles from '../styles/homeStyles';
 
 
 // Função principal - responsável por exibir a tela de entrada do aplicativo
@@ -24,43 +25,3 @@ export default function Home({ navigation }) {
     </View>
   );
 }
-
-// Estilização
-// ----------
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-  },
-  button: {
-    marginBottom: 10,
-    marginTop: 10,
-    padding: 10,
-    backgroundColor: '#3498db',
-    borderRadius: 5,
-    width: 360,
-  },
-  buttonRelatorio: {
-    marginBottom: 80,
-    marginTop: 10,
-    padding: 10,
-    backgroundColor: '#3498db',
-    borderRadius: 5,
-    width: 360,
-  },
-  button2: {
-    marginBottom: 10,
-    marginTop: 10,
-    padding: 10,
-    backgroundColor: 'red',
-    borderRadius: 5,
-    width: 360,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-});
