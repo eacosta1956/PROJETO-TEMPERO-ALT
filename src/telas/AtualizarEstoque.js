@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal, Button  } from 'react-native';
 import { db } from '../database/AbreConexao';
 
-// Função principal - Atualizar o estoque dos produtos
+
 export default function AtualizarEstoque({ route, navigation }) {
   const [produto, setProduto] = useState(null);
   const [quantidade, setQuantidade] = useState('');
@@ -10,6 +10,8 @@ export default function AtualizarEstoque({ route, navigation }) {
   const [modalMessage, setModalMessage] = useState('');
   const [operacaoSucesso, setOperacaoSucesso] = useState(false);
 
+  // mostra na tela os dados do produto selecionado na tela 'listar produtos'
+  // -----------------------------------------------------------------------
   useEffect(() => {
     if (route.params && route.params.produto) {
       setProduto(route.params.produto);
@@ -17,6 +19,9 @@ export default function AtualizarEstoque({ route, navigation }) {
     }
   }, [route.params]);
 
+  // registra a entrada ou saída de um produto na tabela entrada-saída
+  // registra o novo valor de estoque e a data da movimentação na tabela estoque 
+  // ---------------------------------------------------------------------------
   const salvarMovimentacaoEstoque = (operacao) => {
     const currentDate = new Date();
     const formattedDateTime = currentDate.toLocaleDateString('pt-BR') + ' ' + currentDate.toLocaleTimeString('pt-BR');
@@ -69,6 +74,8 @@ export default function AtualizarEstoque({ route, navigation }) {
     });
   };
 
+  // atualiza o estado 'produto'
+  // --------------------------
   const atualizarProdutoSelecionado = (id_produto) => {
     db.transaction((transaction) => {
       transaction.executeSql(
@@ -85,6 +92,8 @@ export default function AtualizarEstoque({ route, navigation }) {
     });
   };
 
+  // modal responsável pelas mensagens da consulta ao banco de dados
+  // ---------------------------------------------------------------
   const CustomModal = () => {
     return (
       <Modal
@@ -111,6 +120,8 @@ export default function AtualizarEstoque({ route, navigation }) {
     );
   };
 
+  // retorno da função
+  // -----------------
   return (
     <View style={styles.container}>
       <View>
@@ -152,6 +163,8 @@ export default function AtualizarEstoque({ route, navigation }) {
   );
 }
 
+// estilização
+// -----------
 const styles = StyleSheet.create({
   container: {
     flex: 1,

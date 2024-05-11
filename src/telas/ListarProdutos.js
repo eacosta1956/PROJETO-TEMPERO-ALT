@@ -252,7 +252,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 10,
+    //paddingVertical: 1,
     paddingHorizontal: 20,
     height: 40,
     borderWidth: 1,
@@ -260,6 +260,7 @@ const styles = StyleSheet.create({
   limparButtonText: {
     color: '#3498db',
     fontWeight: 'bold',
+    fontSize: 12,
   },
   item: {
     backgroundColor: '#f9c2ff',
@@ -275,6 +276,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginTop: 10,
+    marginBottom: 10,
   },
   button1: {
     padding: 10,
@@ -293,7 +295,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#fff',
-    fontSize: 14,
+    fontSize: 12,
   },
 
 });

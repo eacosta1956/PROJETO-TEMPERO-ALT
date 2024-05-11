@@ -3,8 +3,6 @@ import { View, Text, TouchableOpacity, Modal, StyleSheet, Button } from 'react-n
 import { db } from '../database/AbreConexao';
 
 
-// Função principal
-// ----------------
 export default function ExcluirProduto({ route, navigation }) {
   const [produto, setProduto] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);  
@@ -14,18 +12,17 @@ export default function ExcluirProduto({ route, navigation }) {
   const [operacaoSucesso, setOperacaoSucesso] = useState(false);
 
 
-  // É um Hook. Acionado quando a tela ExcluirProduto é carregada
-  // ------------------------------------------------------------
+  // Hook acionado quando a tela ExcluirProduto é carregada
+  // ------------------------------------------------------
   useEffect(() => {
     // Obtém o produto passado pela navegação
     if (route.params && route.params.produto) {
       setProduto(route.params.produto);
-      //console.log("id do produto: ", route.params.produto.id_produto)
     }
   }, [route.params]);
     
-  // Acionada quando o botão Excluir produto é pressionado. Carrega um modal.
-  // -----------------------------------------------------------------------
+  // Acionada quando o botão 'Excluir Produto' é pressionado. Carrega um modal
+  // -------------------------------------------------------------------------
   const confirmarExclusao = () => {
     setModalType('confirm');
   };
@@ -81,6 +78,8 @@ export default function ExcluirProduto({ route, navigation }) {
     });
   };
 
+  // modal de mensagem da consulta ao banco de dados
+  // -----------------------------------------------
   const CustomModal = () => {
     return (
       <Modal
@@ -126,7 +125,8 @@ export default function ExcluirProduto({ route, navigation }) {
         <Text style={styles.buttonText}>Excluir Produto</Text>
       </TouchableOpacity>
 
-
+      {/* modal de confirmação de exclusão do produto 
+          ------------------------------------------- */}
       <Modal
         animationType="slide"
         transparent={true}

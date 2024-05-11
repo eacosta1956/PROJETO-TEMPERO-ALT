@@ -15,6 +15,8 @@ export default function EditarProduto({ route, navigation }) {
   const [modalMessage, setModalMessage] = useState('');
   const [operacaoSucesso, setOperacaoSucesso] = useState(false);
 
+  // ========== mostra na tela os dados do produto selecionado na tela 'listar produtos' ==========
+  // ========== mostra na tela a quantidade da última atualização ==========
   useEffect(() => {
     if (route.params && route.params.produto) {
       setProduto(route.params.produto);
@@ -23,6 +25,7 @@ export default function EditarProduto({ route, navigation }) {
     carregaQuantidadeUltimaOperacao();
   }, [route.params]);
 
+  // ===== busca na tabela produtos, o nome do produto, o tipo do produto e o estoque mínimo =====
   const carregaInformacoesProduto = () => {
     db.transaction((transaction) => {
       transaction.executeSql(
@@ -42,6 +45,8 @@ export default function EditarProduto({ route, navigation }) {
     });
   };
 
+  // ===== busca na tabela entrada_saida, o estoque atual,  =====
+  // ===== a qtde e a data da última atualização no estoque =====
   const carregaQuantidadeUltimaOperacao = () => {
     db.transaction(transaction => {
         transaction.executeSql(
@@ -63,6 +68,7 @@ export default function EditarProduto({ route, navigation }) {
     });
   };
   
+  // ========== armazena no banco de dados as informações editadas pelo usuário ==========
   const salvarAlteracoes = () => {
     const nomeProdutoUpperCase = nomeProduto.toUpperCase();
     const tipoProdutoUpperCase = tipoProduto.toUpperCase();
@@ -122,6 +128,7 @@ export default function EditarProduto({ route, navigation }) {
     });
   };
   
+  //========== modal responsável pelas mensagens da consulta ao banco de dados ==========
   const CustomModal = () => {
     return (
       <Modal
@@ -148,6 +155,7 @@ export default function EditarProduto({ route, navigation }) {
     );
   };
 
+  // ========== retorno da função ==========
   return (
     <View style={styles.container}>
       <View style={styles.infoContainer}>
@@ -167,7 +175,7 @@ export default function EditarProduto({ route, navigation }) {
         </View>
 
         <View style={styles.infoRow}>
-          <Text style={styles.label}>Data da Última Atualização:</Text>
+          <Text style={styles.label}>Última Atualização:</Text>
           <Text style={styles.text}>{dataAtualizacaoEstoque}</Text>
         </View>
       </View>
@@ -213,6 +221,7 @@ export default function EditarProduto({ route, navigation }) {
   );
 }
 
+// ========== estilização ==========
 const styles = StyleSheet.create({
   container: {
     flex: 1,

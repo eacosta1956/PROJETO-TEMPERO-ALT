@@ -28,7 +28,7 @@ export default function RelatorioConsumo() {
 
         // adiciona as duas barras da data
         for (let i = 0; i < formattedText.length; i++) {
-            if (i === 2 || i === 4) {
+            if (i === 4 || i === 6) {
                 formattedDate += '/'; // Adiciona a barra após o segundo e quarto algarismos
             }
             formattedDate += formattedText[i];
@@ -40,7 +40,7 @@ export default function RelatorioConsumo() {
 
     // ================= Alterações em validarDatas ======================
     const validarDatas = () => {
-        const dateRegex = /^\d{2}\/\d{2}\/\d{4}$/; // Expressão regular para validar formato DD/MM/AAAA
+        const dateRegex = /^\d{4}\/\d{2}\/\d{2}$/; // Expressão regular para validar formato AAAA/MM/DD
         if (!dateRegex.test(startDate) || !dateRegex.test(endDate)) {
             console.log('Datas inválidasAAA: ', startDate, endDate);
             setModalErrorVisible(true);
@@ -124,7 +124,7 @@ export default function RelatorioConsumo() {
                     <Text style={styles.label}>Data Inicial</Text>
                     <TextInput
                         style={styles.input}
-                        placeholder="DD-MM-AAAA"
+                        placeholder="AAAA/MM/DD"
                         onChangeText={(text) => handleInputChange(text, setStartDate)}
                         value={startDate}
                         keyboardType="numeric"
@@ -135,7 +135,7 @@ export default function RelatorioConsumo() {
                     <Text style={styles.label}>Data Final</Text>
                     <TextInput
                         style={styles.input}
-                        placeholder="DD-MM-AAAA"
+                        placeholder="AAAA/MM/DD"
                         onChangeText={(text) => handleInputChange(text, setEndDate)}
                         value={endDate}
                         keyboardType="numeric"
@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         padding: 20,
         borderRadius: 10,
-        width: '80%',
+        width: '90%',
         maxHeight: '95%',
     },
     headerText: {
@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     dateText: {
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: 'normal', // Pode ajustar o peso da fonte conforme necessário
         marginBottom: 10,
         textAlign: 'center',

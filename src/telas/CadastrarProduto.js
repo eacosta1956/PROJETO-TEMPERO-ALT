@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal, ScrollView, Button } from 'react-native';
 import { db } from '../database/AbreConexao'; // Importe o banco de dados SQLite
 
-// Função principal - Cadastrar os produtos na tabela produtos do banco de dados
+
 export default function CadastrarProduto({ navigation }) {
   const [descricaoProduto, setDescricaoProduto] = useState('');
   const [estoqueMinimo, setEstoqueMinimo] = useState('');
@@ -14,6 +14,7 @@ export default function CadastrarProduto({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
 
+  //======= lista os produtos que conteem as letras digitadas na TextInput ========
   const buscarProdutos = (texto) => {
     db.transaction((transaction) => {
       transaction.executeSql(
@@ -31,6 +32,7 @@ export default function CadastrarProduto({ navigation }) {
     });
   };
   
+  //======= não permite o cadastro de produtos duplicados =========
   const verificarDuplicata = (nomeProduto) => {
     return new Promise((resolve, reject) => {
       db.transaction((transaction) => {
@@ -54,6 +56,7 @@ export default function CadastrarProduto({ navigation }) {
     });
   };
   
+  //========== armazena o produto no banco de dados ==========
   const salvarProduto = async () => {
     if (!descricaoProduto || !estoqueMinimo || !tipoProduto) {
       setModalMessage('Preencha todos os campos!');
@@ -111,6 +114,7 @@ export default function CadastrarProduto({ navigation }) {
     }
   };
 
+  //========== modal para mensagens ==========
   const CustomModal = () => {
     return (
       <Modal
@@ -134,6 +138,7 @@ export default function CadastrarProduto({ navigation }) {
     );
   };
 
+  //========== retorno da função ==========
   return (
     <View style={styles.container}>
       <TextInput
@@ -169,7 +174,7 @@ export default function CadastrarProduto({ navigation }) {
 
         <View style={styles.radioContainer}>
           <TouchableOpacity
-            style={[styles.radioButton, bebidaSelected ? styles.radioButtonSelected : null]}
+            style={[styles.radioButton1, bebidaSelected ? styles.radioButtonSelected : null]}
             onPress={() => {
               setTipoProduto('Bebida');
               setBebidaSelected(true);
@@ -181,7 +186,7 @@ export default function CadastrarProduto({ navigation }) {
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.radioButton, comidaSelected ? styles.radioButtonSelected : null]}
+            style={[styles.radioButton1, comidaSelected ? styles.radioButtonSelected : null]}
             onPress={() => {
               setTipoProduto('Comida')
               setComidaSelected(true);
@@ -193,7 +198,7 @@ export default function CadastrarProduto({ navigation }) {
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.radioButton, descartavelSelected ? styles.radioButtonSelected : null]}
+            style={[styles.radioButton2, descartavelSelected ? styles.radioButtonSelected : null]}
             onPress={() => {
               setTipoProduto('Descartavel')
               setDescartavelSelected(true)
@@ -216,6 +221,7 @@ export default function CadastrarProduto({ navigation }) {
   );
 }
 
+//========== estilização ==========
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -225,10 +231,10 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-    width: '70%',
+    width: '90%',
   },
   input1: {
-    width: '70%',
+    width: '90%',
     marginBottom: 10,
     marginTop: 40,
     padding: 10,
@@ -256,13 +262,22 @@ const styles = StyleSheet.create({
   },
   radioContainer: {
     flexDirection: 'row',
-    justifyContent: 'center',
-    width: 300,
+    //justifyContent: 'flex-between',
+    //width: '100%',
     marginBottom: 10,
     marginTop: 10,
   },
-  radioButton: {
-    width: 100,
+  radioButton1: {
+    width: 110,
+    paddingVertical: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#3498db',
+    marginRight: 15,
+  },
+  radioButton2: {
+    width: 140,
     paddingVertical: 10,
     borderRadius: 5,
     alignItems: 'center',

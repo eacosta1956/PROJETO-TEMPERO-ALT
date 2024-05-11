@@ -6,7 +6,6 @@ import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 // -------------------------------------------------------------------------
 export default function Home({ navigation }) {
   return (
-    
     <View style={styles.container}>
 
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ListarProdutos')}>
@@ -19,6 +18,20 @@ export default function Home({ navigation }) {
 
       <TouchableOpacity style={styles.buttonRelatorio} onPress={() => navigation.navigate('GerarRelatorios')}>
         <Text style={styles.buttonText}>Gerar Relatórios</Text>
+      </TouchableOpacity>
+
+      {/* ====================================================== */}
+
+      <TouchableOpacity style={styles.button2} onPress={() => navigation.navigate('CadastrarProdutosRelatorio')}>
+        <Text style={styles.buttonText}>Cadastrar Produtos Retroativo</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.button2} onPress={() => navigation.navigate('AtualizarEstoqueRelatorio')}>
+        <Text style={styles.buttonText}>Atualizar Estoque Retroativo</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.button2} onPress={() => navigation.navigate('ListarMovimentacoesModal')}>
+        <Text style={styles.buttonText}>Ver Tabelas</Text>
       </TouchableOpacity>
 
     </View>
