@@ -98,7 +98,8 @@ export default function RelatorioConsumo() {
                  FROM entrada_saida e
                  JOIN produtos p ON e.id_produto = p.id_produto
                  WHERE e.data_atualizacao >= ? || ' 00:00:00'  AND e.data_atualizacao <= ? || ' 23:59:59'
-                 GROUP BY e.id_produto;`,
+                 GROUP BY e.id_produto
+                 ORDER BY p.nome_produto ASC;`,
                  [startDate, endDate],
                 (_, { rows }) => {
                     const relatorioProdutos = rows._array;

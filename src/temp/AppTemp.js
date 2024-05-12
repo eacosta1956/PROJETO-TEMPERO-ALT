@@ -1,19 +1,19 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import Home from './src/telas/Home';
-import { criaTabelas } from './src/database/CriaTabelas';
+import Home from './src/telas/HomeTemp.js';
+import { criaTabelas } from './src/database/CriaTabelas.js';
 
-import AtualizarEstoque from './src/telas/AtualizarEstoque';
-import CadastrarProduto from './src/telas/CadastrarProduto';
-import EditarProduto from './src/telas/EditarProduto';
-import ExcluirProduto from './src/telas/ExcluirProduto';
-import GerarRelatorios from './src/telas/GerarRelatorios';
-import ListarProdutos from './src/telas/ListarProdutos';
+import AtualizarEstoque from './src/telas/AtualizarEstoque.js';
+import CadastrarProduto from './src/telas/CadastrarProduto.js';
+import EditarProduto from './src/telas/EditarProduto.js';
+import ExcluirProduto from './src/telas/ExcluirProduto.js';
+import GerarRelatorios from './src/telas/GerarRelatorios.js';
+import ListarProdutos from './src/telas/ListarProdutos.js';
 
-import CadastrarProdutosRelatorio from './src/temp/CadastrarProdutosRelatorio';
+import CadastrarProdutosRelatorio from './src/temp/CadastrarProdutosRelatorio.js';
 import AtualizarEstoqueRelatorio from './src/temp/AtualizarEstoqueRelatorio.js';
-import ListarMovimentacoesModal from './src/temp/ListarMovimentacoesModal';
+import ListarMovimentacoesModal from './src/temp/ListarMovimentacoesModal.js';
 
 
 // Configuração da navegação
@@ -36,7 +36,7 @@ export default function App() {
   // ------------------------------------------------------
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
+      <Stack.Navigator initialRouteName="HomeTemp">
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="AtualizarEstoque" component={AtualizarEstoque} />
         <Stack.Screen name="CadastrarProduto" component={CadastrarProduto} />
