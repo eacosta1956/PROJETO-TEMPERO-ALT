@@ -1,19 +1,19 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import Home from './src/telas/HomeTemp.js';
-import { criaTabelas } from './src/database/CriaTabelas.js';
+import Home from '../telas/HomeTemp.js';
+import { criaTabelas } from '../database/CriaTabelas.js';
 
-import AtualizarEstoque from './src/telas/AtualizarEstoque.js';
-import CadastrarProduto from './src/telas/CadastrarProduto.js';
-import EditarProduto from './src/telas/EditarProduto.js';
-import ExcluirProduto from './src/telas/ExcluirProduto.js';
-import GerarRelatorios from './src/telas/GerarRelatorios.js';
-import ListarProdutos from './src/telas/ListarProdutos.js';
+import AtualizarEstoque from '../telas/AtualizarEstoque.js';
+import CadastrarProduto from '../telas/CadastrarProduto.js';
+import EditarProduto from '../telas/EditarProduto.js';
+import ExcluirProduto from '../telas/ExcluirProduto.js';
+import GerarRelatorios from '../telas/GerarRelatorios.js';
+import ListarProdutos from '../telas/ListarProdutos.js';
 
-import CadastrarProdutosRelatorio from './src/temp/CadastrarProdutosRelatorio.js';
-import AtualizarEstoqueRelatorio from './src/temp/AtualizarEstoqueRelatorio.js';
-import ListarMovimentacoesModal from './src/temp/ListarMovimentacoesModal.js';
+import CadastrarProdutosRelatorio from './CadastrarProdutosRelatorio.js';
+import AtualizarEstoqueRelatorio from './AtualizarEstoqueRelatorio.js';
+import ListarMovimentacoesModal from './ListarMovimentacoesModal.js';
 
 
 // Configuração da navegação
