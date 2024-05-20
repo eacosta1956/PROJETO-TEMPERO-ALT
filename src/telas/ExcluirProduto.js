@@ -3,7 +3,6 @@ import { View, Text, TouchableOpacity, Modal, StyleSheet, Button } from 'react-n
 import { db } from '../database/AbreConexao';
 import styles from '../styles/excluirProdutoStyles';
 
-
 export default function ExcluirProduto({ route, navigation }) {
   const [produto, setProduto] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);  
@@ -11,7 +10,6 @@ export default function ExcluirProduto({ route, navigation }) {
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
   const [modalType, setModalType] = useState(null);
   const [operacaoSucesso, setOperacaoSucesso] = useState(false);
-
 
   // Hook acionado quando a tela ExcluirProduto é carregada
   // ------------------------------------------------------

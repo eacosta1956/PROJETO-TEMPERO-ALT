@@ -1,123 +1,33 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Platform, Modal, FlatList } from 'react-native';
-import { db } from '../database/AbreConexao';
-import RNHTMLtoPDF from 'react-native-html-to-pdf';
-import PDFLib, { PDFDocument, PDFPage } from 'react-native-pdf-lib';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import styles from '../styles/gerarRelatoriosStyles';
 
-
-
-export default function RelatorioConsumo() {
+export default function GerarRelatorios() {
     const navigation = useNavigation();
-    const route = useRoute(); // Use o hook useRoute para obter os parâmetros da rota
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
-    const [relatorio, setRelatorio] = useState([]);
-    const [modalVisible, setModalVisible] = useState(false);
-    const [modalErrorVisible, setModalErrorVisible] = useState(false);
 
-    //==================== handleInputChange ==================================
     const handleInputChange = (text, setDate) => {
-        const cleanedText = text.replace(/\D/g, ''); // Remove caracteres não numéricos
-
-        // Limitar o input para apenas 8 caracteres
+        const cleanedText = text.replace(/\D/g, ''); // Remove non-numeric characters
         const maxLength = 8;
         const formattedText = cleanedText.slice(0, maxLength);
 
         let formattedDate = '';
-
-        // adiciona as duas barras da data
         for (let i = 0; i < formattedText.length; i++) {
             if (i === 4 || i === 6) {
-                formattedDate += '/'; // Adiciona a barra após o segundo e quarto algarismos
+                formattedDate += '/';
             }
             formattedDate += formattedText[i];
         }
 
-        setDate(formattedDate); // Define a data formatada
-
+        setDate(formattedDate);
     };
 
-    // ================= Alterações em validarDatas ======================
-    const validarDatas = () => {
-        const dateRegex = /^\d{4}\/\d{2}\/\d{2}$/; // Expressão regular para validar formato AAAA/MM/DD
-        if (!dateRegex.test(startDate) || !dateRegex.test(endDate)) {
-            console.log('Datas inválidasAAA: ', startDate, endDate);
-            setModalErrorVisible(true);
-            return false;
-        }
-        console.log('Datas válidasBBB: ', startDate, endDate);
-        return true;
-    };
-    // ============================ fecharModalErro ===========================
-    // Função para fechar o modal de erro
-    const fecharModalErro = () => {
-        setModalErrorVisible(false);
-    };
-    //============================= fecharModal ===============================
-    // Função para fechar o modal do relatório e retornar à tela Home
-    const fecharModal = () => {
-        setModalVisible(false); // Fecha o modal
-        navigation.navigate('Home'); // Retorna à tela Home
-    };
-    //============================= gerarRelatorio ============================
-    const gerarRelatorio = () => {
-        console.log('startDateXXX:', startDate);
-        console.log('endDateXXX:', endDate);
-
-        if (startDate.length !== 10 || endDate.length !== 10) {
-            console.log('startDateYYY:', startDate);
-            setModalErrorVisible(true);
-            return;
-        }
-
-        // Adicionar a chamada para validar as datas
-        const datasValidas = validarDatas();
-        if (!datasValidas) {
-            // Se as datas não forem válidas, não continue
-            return;
-        }
-        // Verifica se startDate e endDate são objetos Date válidos
-/*         if (!(startDate instanceof Date) || !(endDate instanceof Date)) {
-            setModalErrorVisible(true);
-            return;
-        } */
-
-        console.log('startDateZZZ:', startDate);
-        console.log('endDateZZZ:', endDate);
-
-        console.log('Iniciando transação SQL...');
-        db.transaction((transaction) => {
-            transaction.executeSql(
-                `SELECT 
-                    e.id_produto, 
-                    SUM(CASE WHEN e.quantidade >= 0 THEN e.quantidade ELSE 0 END) AS total_entradas,
-                    SUM(CASE WHEN e.quantidade < 0 THEN ABS(e.quantidade) ELSE 0 END) AS total_saidas,
-                    p.nome_produto
-                 FROM entrada_saida e
-                 JOIN produtos p ON e.id_produto = p.id_produto
-                 WHERE e.data_atualizacao >= ? || ' 00:00:00'  AND e.data_atualizacao <= ? || ' 23:59:59'
-                 GROUP BY e.id_produto
-                 ORDER BY p.nome_produto ASC;`,
-                 [startDate, endDate],
-                (_, { rows }) => {
-                    const relatorioProdutos = rows._array;
-                    console.log('Relatório gerado:', relatorioProdutos);
-                    setRelatorio(relatorioProdutos);
-                    setModalVisible(true);
-                    //const periodoRelatorio = `Relatório de Consumo (${startDate} a ${endDate})`;
-                    //navigation.setParams({ tituloRelatorio: periodoRelatorio });
-
-                },
-                (_, error) => {
-                    console.log('Erro ao gerar relatório:', error);
-                }
-            );
-        });
+    const navigateToRelatorio = (tipo) => {
+        navigation.navigate(tipo, { startDate, endDate });
     };
 
-    //============================= return ====================================
     return (
         <View style={styles.container}>
             <View style={styles.topContainer}>
@@ -146,52 +56,16 @@ export default function RelatorioConsumo() {
                 </View>
             </View>
             <View style={styles.buttonContainer}>
-                <TouchableOpacity style={styles.button} onPress={gerarRelatorio}>
-                    <Text style={styles.buttonText}>Ver Detalhes</Text>
+                <TouchableOpacity style={styles.button} onPress={() => navigateToRelatorio('RelatorioEntradasSaidas')}>
+                    <Text style={styles.buttonText}>Emitir Relatório de Entradas e Saídas</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.button} onPress={() => navigateToRelatorio('RelatorioDespesas')}>
+                    <Text style={styles.buttonText}>Emitir Relatório de Despesas</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.button} onPress={() => navigateToRelatorio('RelatorioLucro')}>
+                    <Text style={styles.buttonText}>Emitir Relatório de Lucro</Text>
                 </TouchableOpacity>
             </View>
-            
-            <Modal animationType="slide" transparent={true} visible={modalVisible}>
-                <View style={styles.modalContainer}>
-                    <View style={styles.modalContent}>
-                        <Text style={styles.headerText}>Relatório de Consumo</Text>
-                        <Text style={styles.dateText}>
-                            Período: {startDate} a {endDate}
-                        </Text>
-                        <FlatList
-                            data={relatorio}
-                            keyExtractor={(item) => item.id_produto.toString()}
-                            renderItem={({ item }) => (
-                                <View style={styles.itemContainer}>
-                                    <Text style={styles.itemText}>
-                                        Produto: <Text style={styles.productName}>{item.nome_produto}</Text>
-                                    </Text>
-                                    <Text>Entradas: {item.total_entradas}</Text>
-                                    <Text>Saídas: {item.total_saidas}</Text>
-                                    <Text>Diferença: {item.total_entradas - item.total_saidas}</Text>
-                                </View>
-                            )}
-                        />
-                        <TouchableOpacity style={styles.closeButton} onPress={fecharModal}>
-                            <Text style={styles.buttonText}>Fechar</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            </Modal>
-
-            
-            <Modal animationType="slide" transparent={true} visible={modalErrorVisible}>
-                <View style={styles.modalContainer}>
-                    <View style={styles.modalContent}>
-                        <Text style={styles.headerText}>Erro</Text>
-                        <Text style={styles.errorMessage}>Por favor, insira uma data válida.</Text>
-                        <TouchableOpacity style={styles.closeButton} onPress={fecharModalErro}>
-                            <Text style={styles.buttonText}>Fechar</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            </Modal>
         </View>
     );
 }
-

@@ -7,6 +7,21 @@ export default StyleSheet.create({
         backgroundColor: '#fff',
         padding: 20,
     },
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContent: {
+        backgroundColor: '#fff',
+        padding: 20,
+        borderRadius: 10,
+        width: '90%',
+        maxHeight: '95%',
+    },
+
+
     // Estilos para o botão e o modal
     button: {
         width: 360,
@@ -23,32 +38,17 @@ export default StyleSheet.create({
         textAlign: 'center',
         textAlignVertical: 'center',
     },
-    inputContainer: {
-        marginBottom: 20,
+      input: {
+        width: 200,
+        height: 40,
+        borderColor: '#ccc',
+        borderWidth: 1,
+        borderRadius: 5,
+        paddingHorizontal: 10,
+        textAlign: 'center', // Centraliza o texto horizontalmente
+        textAlignVertical: 'center', // Centraliza o texto verticalmente
     },
-    input: {
-    width: 200,
-    height: 40,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    textAlign: 'center', // Centraliza o texto horizontalmente
-    textAlignVertical: 'center', // Centraliza o texto verticalmente
-    },
-    modalContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    },
-    modalContent: {
-        backgroundColor: '#fff',
-        padding: 20,
-        borderRadius: 10,
-        width: '90%',
-        maxHeight: '95%',
-    },
+    
     headerText: {
         fontSize: 20,
         fontWeight: 'bold',
@@ -61,7 +61,7 @@ export default StyleSheet.create({
     closeButton: {
         marginTop: 20,
         padding: 10,
-        backgroundColor: '#e74c3c',
+        backgroundColor: '#d6301d',
         borderRadius: 5,
         alignItems: 'center',
     },
@@ -81,7 +81,9 @@ export default StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-
+    inputContainer: {
+        marginBottom: 20,
+    },
     periodText: {
         fontSize: 20,
         fontWeight: 'bold',

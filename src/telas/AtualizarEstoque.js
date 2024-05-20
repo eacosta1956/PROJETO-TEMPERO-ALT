@@ -7,6 +7,9 @@ import styles from '../styles/atualizarEstoqueStyles';
 export default function AtualizarEstoque({ route, navigation }) {
   const [produto, setProduto] = useState(null);
   const [quantidade, setQuantidade] = useState('');
+  const [precoCompra, setPrecoCompra] = useState('');
+  const [precoVenda, setPrecoVenda] = useState('');
+  //const [tipoProduto, setTipoProduto] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
   const [operacaoSucesso, setOperacaoSucesso] = useState(false);
@@ -17,6 +20,8 @@ export default function AtualizarEstoque({ route, navigation }) {
     if (route.params && route.params.produto) {
       setProduto(route.params.produto);
       setQuantidade('');
+      setPrecoCompra('');
+      setPrecoVenda('');
     }
   }, [route.params]);
 
@@ -24,9 +29,21 @@ export default function AtualizarEstoque({ route, navigation }) {
   // registra o novo valor de estoque e a data da movimentação na tabela estoque 
   // ---------------------------------------------------------------------------
   const salvarMovimentacaoEstoque = (operacao) => {
-    const currentDate = new Date();
-    const formattedDateTime = currentDate.toLocaleDateString('pt-BR') + ' ' + currentDate.toLocaleTimeString('pt-BR');
 
+    // data no formato 'AAAA/MM/DD hh:mm:ss'
+    // -------------------------------------
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+    const day = String(currentDate.getDate()).padStart(2, '0');
+    const hours = String(currentDate.getHours()).padStart(2, '0');
+    const minutes = String(currentDate.getMinutes()).padStart(2, '0');
+    const seconds = String(currentDate.getSeconds()).padStart(2, '0');
+    const formattedDateTime = `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
+    // -------------------------------------
+
+    // Impede a retirada de uma quantidade maior do que o estoque
+    // ----------------------------------------------------------
     const qtdInt = parseInt(quantidade);
     if (operacao === 'retirar' && qtdInt > produto.estoque_atual) {
       setModalMessage('Quantidade a retirar maior que o estoque atual!');
@@ -41,16 +58,18 @@ export default function AtualizarEstoque({ route, navigation }) {
       transaction.executeSql(
         `UPDATE estoque
         SET estoque_atual = estoque_atual + ?, data_atualizacao_estoque = ? 
+        ultimo_preco_compra = ?
+        ultimo_preco_venda = ?
         WHERE id_produto = ?;`,
-        [qtdMovimentada, formattedDateTime, produto.id_produto],
+        [qtdMovimentada, formattedDateTime, produto.id_produto, precoCompra, precoVenda],
         
         (_, { rowsAffected }) => {
           if (rowsAffected > 0) {
             atualizarProdutoSelecionado(produto.id_produto);
 
             transaction.executeSql(
-              `INSERT INTO entrada_saida (id_produto, quantidade, data_atualizacao, estoque_atual) VALUES (?, ?, ?, ?);`,
-              [produto.id_produto, qtdMovimentada, formattedDateTime, qtdMovimentada + produto.estoque_atual],
+              `INSERT INTO entrada_saida (id_produto, quantidade, data_atualizacao, estoque_atual, preco_compra, preco_venda) VALUES (?, ?, ?, ?, ?, ?);`,
+              [produto.id_produto, qtdMovimentada, formattedDateTime, qtdMovimentada + produto.estoque_atual, precoCompra, precoVenda],
               () => {
                 setModalMessage('Movimentação de estoque realizada com sucesso!');
                 setOperacaoSucesso(true);
@@ -121,6 +140,20 @@ export default function AtualizarEstoque({ route, navigation }) {
     );
   };
 
+  function exibir() {
+    if (produto && produto.tipo_produto.toLowerCase() === 'bebida') {
+        return(
+          <TextInput
+          style={styles.input}
+          placeholder="Preço de Venda"
+          keyboardType="numeric"
+          value={precoVenda}
+          onChangeText={(text) => setPrecoVenda(text)}
+        />
+        )
+      }
+  }
+
   // retorno da função
   // -----------------
   return (
@@ -129,7 +162,7 @@ export default function AtualizarEstoque({ route, navigation }) {
         {produto && (
           <>
             <Text>Nome do Produto: {produto.nome_produto}</Text>
-            <Text>ID do Produto: {produto.id_produto}</Text>
+            <Text>Tipo do Produto: {produto.tipo_produto}</Text>
             <Text>Estoque Atual: {produto.estoque_atual}</Text>
             <Text>Estoque Mínimo: {produto.estoque_minimo}</Text>
           </>
@@ -144,6 +177,16 @@ export default function AtualizarEstoque({ route, navigation }) {
         onChangeText={(text) => setQuantidade(text)}
       />
 
+      <TextInput
+        style={styles.input}
+        placeholder="Preço de Compra"
+        keyboardType="numeric"
+        value={precoCompra}
+        onChangeText={(text) => setPrecoCompra(text)}
+      />
+
+      {exibir()}
+      
       <TouchableOpacity
         style={[styles.button, { backgroundColor: '#27ae60' }]}
         onPress={() => salvarMovimentacaoEstoque('adicionar')}

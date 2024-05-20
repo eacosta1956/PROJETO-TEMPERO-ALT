@@ -4,7 +4,6 @@ import { useFocusEffect } from '@react-navigation/native';
 import { db } from '../database/AbreConexao';
 import styles from '../styles/listarProdutosStyles';
 
-
 export default function ListarProdutos({ navigation }) {
   const [produtos, setProdutos] = useState([]);
   const [produtoSelecionado, setProdutoSelecionado] = useState(null);
@@ -14,8 +13,6 @@ export default function ListarProdutos({ navigation }) {
   const [filtroNomeProduto, setFiltroNomeProduto] = useState('');
   const [filtroTipoProduto, setFiltroTipoProduto] = useState('');
   const [filtroEstoqueMinimo, setFiltroEstoqueMinimo] = useState(false);
-
-  //const [filtroAtivo, setFiltroAtivo] = useState(false); // Novo state para controle do filtro
 
   useEffect(() => {
     carregarProdutos();
@@ -72,10 +69,10 @@ export default function ListarProdutos({ navigation }) {
       }
   
       if (filtroNomeProduto.trim() !== '') {
-        const searchTerm = filtroNomeProduto.trim().toLowerCase(); // Remover espaços em branco e tornar minúsculas
+        const searchTerm = filtroNomeProduto.trim().toLowerCase();
         query += ` WHERE LOWER(p.nome_produto) LIKE '%${searchTerm}%'`;
       } else if (filtroTipoProduto.trim() !== '') {
-        const searchTerm = filtroTipoProduto.trim().toLowerCase(); // Remover espaços em branco e tornar minúsculas
+        const searchTerm = filtroTipoProduto.trim().toLowerCase();
         query += ` WHERE LOWER(p.tipo_produto) LIKE '%${searchTerm}%'`;
       }
   
@@ -140,15 +137,13 @@ export default function ListarProdutos({ navigation }) {
     setFiltroEstoqueMinimo(false);
   };
 
-
-
   const renderItem = ({ item }) => (
     <TouchableOpacity 
       onPress={() => handleSelecionarProduto(item)}
       style={[styles.item, { backgroundColor: item.id_produto === itemSelecionado ? '#aaa' : '#f9c2ff' }]}
     >
       <Text style={styles.nomeProduto}>Nome: {item.nome_produto}</Text>
-      <Text>ID: {item.id_produto}</Text>
+      <Text>Tipo: {item.tipo_produto}</Text>
       <Text>Estoque Atual: {item.estoque_atual}</Text>
       <Text>Estoque Mínimo: {item.estoque_minimo}</Text>
     </TouchableOpacity>
@@ -196,10 +191,6 @@ export default function ListarProdutos({ navigation }) {
         </TouchableOpacity>
       </View>
 
-
-
-
-
       <FlatList
         data={produtos}
         renderItem={renderItem}
@@ -207,15 +198,19 @@ export default function ListarProdutos({ navigation }) {
       />
 
       <View style={styles.buttonContainer}>
+        
         <TouchableOpacity style={styles.buttonAtualizar} onPress={handleAtualizarEstoque}>
           <Text style={styles.buttonText}>Atualizar Estoque</Text>
         </TouchableOpacity>
+
         <TouchableOpacity style={styles.buttonEditar} onPress={handleEditarProduto}>
           <Text style={styles.buttonText}>  Editar Registro</Text>
         </TouchableOpacity>
+
         <TouchableOpacity style={styles.buttonExcluir} onPress={handleExcluirProduto}>
           <Text style={styles.buttonText}> Excluir Registro</Text>
         </TouchableOpacity>
+
       </View>
 
     </View>

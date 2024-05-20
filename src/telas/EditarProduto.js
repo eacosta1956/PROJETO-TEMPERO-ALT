@@ -9,6 +9,8 @@ export default function EditarProduto({ route, navigation }) {
   const [tipoProduto, setTipoProduto] = useState('');
   const [estoqueProduto, setEstoqueProduto] = useState('');
   const [estoqueMinimo, setEstoqueMinimo] = useState('');
+  const [precoCompra, setPrecoCompra] = useState('');
+  const [precoVenda, setPrecoVenda] = useState('');
   const [quantidadeNovaAtualizacao, setQuantidadeNovaAtualizacao] = useState('');
   const [quantidadeUltimaAtualizacao, setQuantidadeUltimaAtualizacao] = useState('');
   const [dataAtualizacaoEstoque, setDataAtualizacaoEstoque] = useState('');
@@ -20,114 +22,156 @@ export default function EditarProduto({ route, navigation }) {
   // ========== mostra na tela a quantidade da última atualização ==========
   useEffect(() => {
     if (route.params && route.params.produto) {
-      setProduto(route.params.produto);
+      carregaInformacoesProduto();
+      carregaQuantidadeUltimaOperacao();
     }
-    carregaInformacoesProduto();
-    carregaQuantidadeUltimaOperacao();
   }, [route.params]);
 
   // ===== busca na tabela produtos, o nome do produto, o tipo do produto e o estoque mínimo =====
   const carregaInformacoesProduto = () => {
     db.transaction((transaction) => {
-      transaction.executeSql(
-        'SELECT nome_produto, tipo_produto, estoque_minimo FROM produtos WHERE id_produto = ?',
-        [route.params.produto.id_produto],
-        (_, { rows }) => {
-          const produto = rows.item(0);
-          setNomeProduto(produto.nome_produto);
-          setTipoProduto(produto.tipo_produto);
-          setEstoqueMinimo(String(produto.estoque_minimo));
-        },
-        (_, error) => {
-          setModalMessage('Erro ao carregar informações do produto:', error);
-          setModalVisible(true);
-        }
-      );
-    });
-  };
-
-  // ===== busca na tabela entrada_saida, o estoque atual,  =====
-  // ===== a qtde e a data da última atualização no estoque =====
-  const carregaQuantidadeUltimaOperacao = () => {
-    db.transaction(transaction => {
         transaction.executeSql(
-            'SELECT quantidade, data_atualizacao, estoque_atual FROM entrada_saida WHERE id_produto = ? ORDER BY data_atualizacao DESC LIMIT 1',
+            'SELECT nome_produto, tipo_produto, estoque_minimo FROM produtos WHERE id_produto = ?',
             [route.params.produto.id_produto],
             (_, { rows }) => {
                 if (rows.length > 0) {
-                    const operacao = rows.item(0);
-                    setQuantidadeUltimaAtualizacao(String(operacao.quantidade));
-                    setDataAtualizacaoEstoque(String(operacao.data_atualizacao));
-                    setEstoqueProduto(String(operacao.estoque_atual));
+                    const produto = rows.item(0);
+                    setNomeProduto(produto.nome_produto);
+                    setTipoProduto(produto.tipo_produto);
+                    setEstoqueMinimo(String(produto.estoque_minimo));
+                    console.log('Informações do produto carregadas:', produto);
+                } else {
+                    console.log('Nenhum produto encontrado com o id especificado.');
+                    setModalMessage('Nenhum produto encontrado com o id especificado.');
+                    setModalVisible(true);
                 }
             },
             (_, error) => {
-              setModalMessage('Erro ao carregar quantidade da última operação:', error);
-              setModalVisible(true);
+                console.log('Erro ao carregar informações do produto:', error);
+                setModalMessage('Erro ao carregar informações do produto:', error);
+                setModalVisible(true);
             }
         );
     });
-  };
+};
+
+  // Função para carregar quantidade da última operação
+const carregaQuantidadeUltimaOperacao = () => {
+  console.log("Função carregaQuantidadeUltimaOperacao chamada");
+  console.log("ID do produto:", route.params.produto.id_produto);
+
+  db.transaction(transaction => {
+      transaction.executeSql(
+          'SELECT quantidade, data_atualizacao, estoque_atual, preco_compra, preco_venda FROM entrada_saida WHERE id_produto = ? ORDER BY data_atualizacao DESC LIMIT 1',
+          [route.params.produto.id_produto],
+          (_, { rows }) => {
+              console.log("Consulta SQL executada");
+              if (rows.length > 0) {
+                  console.log('Rows found:', rows.length);
+                  const operacao = rows.item(0);
+                  console.log('Dados da última operação:', operacao);
+                  setQuantidadeUltimaAtualizacao(String(operacao.quantidade));
+                  setDataAtualizacaoEstoque(String(operacao.data_atualizacao));
+                  setEstoqueProduto(String(operacao.estoque_atual));
+                  setPrecoCompra(String(operacao.preco_compra));
+                  setPrecoVenda(String(operacao.preco_venda));
+              } else {
+                  console.log('Nenhum resultado encontrado para este id_produto');
+                  setModalMessage('Nenhum resultado encontrado para este id_produto');
+                  setModalVisible(true);
+              }
+          },
+          (_, error) => {
+              console.log('Erro ao carregar quantidade da última operação:', error);
+              setModalMessage('Erro ao carregar quantidade da última operação:', error);
+              setModalVisible(true);
+          }
+      );
+  });
+};
+
+const capitalizeFirstLetter = (string) => {
+  return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+};
   
   // ========== armazena no banco de dados as informações editadas pelo usuário ==========
   const salvarAlteracoes = () => {
     const nomeProdutoUpperCase = nomeProduto.toUpperCase();
-    const tipoProdutoUpperCase = tipoProduto.toUpperCase();
+    let tipoProdutoFormatado = capitalizeFirstLetter(tipoProduto);
+
+    //const tipoProdutoUpperCase = tipoProduto.toUpperCase();
+    console.log('Id do Produto:', route.params.produto.id_produto);
+    console.log('Preço de Compra:', precoCompra);
+    console.log('Preço de Venda:', precoVenda);
+    console.log('Estoque Mínimo:', estoqueMinimo);
+    console.log('Nome do Produto:', nomeProduto);
+    console.log('Tipo do Produto:', tipoProduto);
+    //console.log('Nova quantidade:', novaQuantidade);
+    console.log('Estoque Atual:', estoqueProduto);
 
     db.transaction((transaction) => {
-      transaction.executeSql(
-        `UPDATE produtos 
-          SET nome_produto = ?, 
-          tipo_produto = ?, 
-          estoque_minimo = ? 
-        WHERE id_produto = ?;`,
-        [nomeProdutoUpperCase, tipoProdutoUpperCase, parseInt(estoqueMinimo), route.params.produto.id_produto],
-        (_, result) => {
-          if (quantidadeNovaAtualizacao.trim() !== '') {
-            const quantidadeAntiga = parseFloat(quantidadeUltimaAtualizacao);
-            const novaQuantidade = parseFloat(quantidadeNovaAtualizacao);
-            const diferenca = novaQuantidade - quantidadeAntiga;
-  
-            transaction.executeSql(
-              `UPDATE entrada_saida
-              SET quantidade = ?,
-              estoque_atual = estoque_atual + ?
-              WHERE id_produto = ? AND data_atualizacao = ?;`,
-              [quantidadeNovaAtualizacao, diferenca, route.params.produto.id_produto, dataAtualizacaoEstoque],
-              (_, result) => {
+        transaction.executeSql(
+            `UPDATE produtos 
+            SET nome_produto = ?, 
+                tipo_produto = ?, 
+                estoque_minimo = ? 
+            WHERE id_produto = ?;`,
+            [nomeProdutoUpperCase, tipoProdutoFormatado, parseInt(estoqueMinimo), route.params.produto.id_produto],
+            (_, result) => {
+                let quantidade;
+                let diferenca = 0;
+                if (quantidadeNovaAtualizacao.trim() !== '') {
+                    const quantidadeAntiga = parseFloat(quantidadeUltimaAtualizacao);
+                    const novaQuantidade = parseInt(quantidadeNovaAtualizacao);
+                    diferenca = novaQuantidade - quantidadeAntiga;
+                    quantidade = novaQuantidade;
+                } else {
+                    quantidade = parseInt(quantidadeUltimaAtualizacao);
+                }
+
                 transaction.executeSql(
-                  `UPDATE estoque
-                  SET estoque_atual = estoque_atual + ?
-                  WHERE id_produto = ?;`,
-                  [diferenca, route.params.produto.id_produto],
-                  (_, result) => {
-                    // Atualizações concluídas
-                  },
-                  (_, error) => {
-                    // Erro na atualização do estoque
-                  }
+                    `UPDATE entrada_saida
+                    SET quantidade = ?,
+                        estoque_atual = estoque_atual + ?,
+                        preco_compra = ?,
+                        preco_venda = ?
+                    WHERE id_produto = ? AND data_atualizacao = ?;`,
+                    [quantidade, diferenca, parseFloat(precoCompra), parseFloat(precoVenda), route.params.produto.id_produto, dataAtualizacaoEstoque],
+                    (_, result) => {
+                        transaction.executeSql(
+                            `UPDATE estoque
+                            SET estoque_atual = estoque_atual + ?,
+                                ultimo_preco_compra = ?,
+                                ultimo_preco_venda = ?
+                            WHERE id_produto = ?;`,
+                            [diferenca, parseFloat(precoCompra), parseFloat(precoVenda), route.params.produto.id_produto],
+                            (_, result) => {
+                                console.log('Tabela estoque atualizada');
+                                setModalMessage('Transação concluída com sucesso.');
+                                setOperacaoSucesso(true);
+                                setModalVisible(true);
+                            },
+                            (_, error) => {
+                                console.log('Erro na atualização do estoque', error);
+                            }
+                        );
+                    },
+                    (_, error) => {
+                        console.log('Erro na atualização da entrada_saida', error);
+                    }
                 );
-              },
-              (_, error) => {
-                // Erro na atualização da entrada_saida
-              }
-            );
-          } else {
-            // A quantidade da nova atualização está vazia
-          }
-        },
-        (_, error) => {
-          // Erro na atualização de produtos
-        }
-      );
-    }, (error) => {
-      // Erro na transação
-    }, () => {
-      setModalMessage('Transação concluída com sucesso.');
-      setOperacaoSucesso(true);
-      setModalVisible(true);
+            },
+            (_, error) => {
+                console.log('Erro na atualização de produtos', error);
+            }
+        );
+    }, 
+    (error) => {
+        console.log('Erro na transação geral', error);
     });
-  };
+};
+
+
   
   //========== modal responsável pelas mensagens da consulta ao banco de dados ==========
   const CustomModal = () => {
@@ -156,6 +200,30 @@ export default function EditarProduto({ route, navigation }) {
     );
   };
 
+
+  function exibir1() {
+    //console.log('Tipo de Produto:', tipoProduto);
+    if (tipoProduto === 'BEBIDA') {
+      return(
+        <Text style={styles.label}>Preço Última Venda:</Text>
+      )
+    }
+  }
+
+  function exibir2() {
+    //console.log('Tipo de Produto:', tipoProduto);
+    if (tipoProduto === 'BEBIDA') {
+      return(
+        <TextInput
+          style={styles.input}
+          onChangeText={setPrecoVenda}
+          value={precoVenda}
+          keyboardType="numeric"
+        />
+      )
+    }
+  }
+
   // ========== retorno da função ==========
   return (
     <View style={styles.container}>
@@ -179,6 +247,7 @@ export default function EditarProduto({ route, navigation }) {
           <Text style={styles.label}>Última Atualização:</Text>
           <Text style={styles.text}>{dataAtualizacaoEstoque}</Text>
         </View>
+
       </View>
       
       <Text style={styles.label}>Nome do Produto:</Text>
@@ -210,6 +279,17 @@ export default function EditarProduto({ route, navigation }) {
         value={quantidadeNovaAtualizacao}
         keyboardType="numeric"
       />
+
+      <Text style={styles.label}>Preço Última Compra:</Text>
+      <TextInput
+        style={styles.input}
+        onChangeText={setPrecoCompra}
+        value={precoCompra}
+        keyboardType="numeric"
+      />
+
+      {exibir1()}
+      {exibir2()}
       
       <TouchableOpacity 
         style={styles.button}

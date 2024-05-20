@@ -13,7 +13,7 @@ export default StyleSheet.create({
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      marginBottom: 10,
+      marginBottom: 5,
     },
     label: {
       fontSize: 16,
@@ -24,7 +24,7 @@ export default StyleSheet.create({
     },
     input: {
       width: '100%',
-      height: 40,
+      height: 30,
       borderWidth: 1,
       borderColor: '#ccc',
       borderRadius: 5,

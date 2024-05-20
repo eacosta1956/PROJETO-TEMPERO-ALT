@@ -14,7 +14,8 @@ export default function CadastrarProduto({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
 
-  //======= lista os produtos que conteem as letras digitadas na TextInput ========
+  // lista os produtos que conteem as letras digitadas na TextInput
+  // --------------------------------------------------------------
   const buscarProdutos = (texto) => {
     db.transaction((transaction) => {
       transaction.executeSql(
@@ -32,7 +33,8 @@ export default function CadastrarProduto({ navigation }) {
     });
   };
   
-  //======= não permite o cadastro de produtos duplicados =========
+  // não permite o cadastro de produtos duplicados
+  // ---------------------------------------------
   const verificarDuplicata = (nomeProduto) => {
     return new Promise((resolve, reject) => {
       db.transaction((transaction) => {
@@ -56,7 +58,8 @@ export default function CadastrarProduto({ navigation }) {
     });
   };
   
-  //========== armazena o produto no banco de dados ==========
+  // armazena o produto no banco de dados
+  // ------------------------------------
   const salvarProduto = async () => {
     if (!descricaoProduto || !estoqueMinimo || !tipoProduto) {
       setModalMessage('Preencha todos os campos!');
@@ -71,11 +74,27 @@ export default function CadastrarProduto({ navigation }) {
       if (produtoDuplicado) {
         setModalMessage('Este produto já está cadastrado!');
         setModalVisible(true);
+        setDescricaoProduto('');
+        setEstoqueMinimo('');
+        setTipoProduto('');
+        setBebidaSelected(false);
+        setComidaSelected(false);
+        setDescartavelSelected(false);
+        setProdutosEncontrados([]);
         return;
       }
 
+      // data no formato 'AAAA/MM/DD hh:mm:ss'
+      // -------------------------------------
       const currentDate = new Date();
-      const formattedDateTime = currentDate.toLocaleDateString('pt-BR') + ' ' + currentDate.toLocaleTimeString('pt-BR');
+      const year = currentDate.getFullYear();
+      const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+      const day = String(currentDate.getDate()).padStart(2, '0');
+      const hours = String(currentDate.getHours()).padStart(2, '0');
+      const minutes = String(currentDate.getMinutes()).padStart(2, '0');
+      const seconds = String(currentDate.getSeconds()).padStart(2, '0');
+      const formattedDateTime = `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
+      // -------------------------------------
 
       db.transaction((transaction) => {
         transaction.executeSql(
@@ -84,8 +103,8 @@ export default function CadastrarProduto({ navigation }) {
           [descricaoUpperCase, parseInt(estoqueMinimo), tipoProduto, formattedDateTime],
           (_, { insertId }) => {
             transaction.executeSql(
-              `INSERT INTO estoque (id_produto, estoque_atual, data_atualizacao_estoque) VALUES (?, ?, ?);`,
-              [insertId, 0, formattedDateTime],
+              `INSERT INTO estoque (id_produto, estoque_atual, data_atualizacao_estoque, ultimo_preco_compra, ultimo_preco_venda) VALUES (?, ?, ?, ?, ?);`,
+              [insertId, 0, formattedDateTime, 0, 0],
               () => {
                 setModalMessage('Produto cadastrado com sucesso!');
                 setModalVisible(true);
