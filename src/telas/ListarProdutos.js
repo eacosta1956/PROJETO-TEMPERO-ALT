@@ -140,7 +140,7 @@ export default function ListarProdutos({ navigation }) {
   const renderItem = ({ item }) => (
     <TouchableOpacity 
       onPress={() => handleSelecionarProduto(item)}
-      style={[styles.item, { backgroundColor: item.id_produto === itemSelecionado ? '#aaa' : '#f9c2ff' }]}
+      style={[styles.item, item.id_produto === itemSelecionado ? styles.itemSelecionado : null]}
     >
       <Text style={styles.nomeProduto}>Nome: {item.nome_produto}</Text>
       <Text>Tipo: {item.tipo_produto}</Text>

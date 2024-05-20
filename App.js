@@ -16,41 +16,39 @@ import RelatorioDespesas from './src/telas/RelatorioDespesas';
 import RelatorioLucro from './src/telas/RelatorioLucro';
 
 // Configuração da navegação
-// -------------------------
 const Stack = createStackNavigator();
 
 // Função principal
-// ----------------
 export default function App() {
   // Cria as tabelas no banco de dados ao iniciar o aplicativo
-  // ---------------------------------------------------------
   React.useEffect(() => {
     criaTabelas();
   }, []);
 
-
   // Retorno da função principal
-  // Esse trecho de código está configurando a navegação do
-  // aplicativo usando o React Navigation
-  // ------------------------------------------------------
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen name="Home" component={Home} />
+      <Stack.Navigator
+        initialRouteName="Home"
+        screenOptions={{
+          headerStyle: {
+            backgroundColor: '#e3731b',
+          },
+          headerTintColor: '#fff',
+          headerTitleAlign: 'center',
+        }}
+      >
+        <Stack.Screen name="Home" component={Home} options={{ title: 'Controle de Estoque' }} />
         <Stack.Screen name="ApagarDados" component={ApagarDados} />
         <Stack.Screen name="AtualizarEstoque" component={AtualizarEstoque} />
         <Stack.Screen name="CadastrarProduto" component={CadastrarProduto} />
         <Stack.Screen name="EditarProduto" component={EditarProduto} />
         <Stack.Screen name="ExcluirProduto" component={ExcluirProduto} />
         <Stack.Screen name="GerarRelatorios" component={GerarRelatorios} />
-        <Stack.Screen name="ListarProdutos" component={ListarProdutos} />
-
+        <Stack.Screen name="ListarProdutos" component={ListarProdutos} options={{ title: 'Produtos Cadastrados' }} />
         <Stack.Screen name="RelatorioEntradasSaidas" component={RelatorioEntradasSaidas} />
         <Stack.Screen name="RelatorioDespesas" component={RelatorioDespesas} />
         <Stack.Screen name="RelatorioLucro" component={RelatorioLucro} />
-
-        {/* ======================================================== */}
-
       </Stack.Navigator>
     </NavigationContainer>
   );

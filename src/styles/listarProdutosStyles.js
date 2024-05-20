@@ -4,13 +4,13 @@ export default StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
-    backgroundColor: '#fff',
+    backgroundColor: '#f2cd54',
     paddingTop: 10,
-    marginLeft: 20,
+    paddingHorizontal: 10,
   },
 
   opcaoButtonEstMin: {
-    backgroundColor: '#fff',
+    backgroundColor: '#4e6f35',
     borderRadius: 5,
     paddingVertical: 1,
     height: 40,
@@ -21,7 +21,7 @@ export default StyleSheet.create({
     borderWidth: 1,
   },
   opcaoTextEstMin: {
-    color: '#3498db',
+    color: '#fff',
     fontWeight: 'bold',
     fontSize: 14,
   },
@@ -29,7 +29,7 @@ export default StyleSheet.create({
     color: '#fff',
   },
   filtroSelecionado: {
-    backgroundColor: '#3498db',
+    backgroundColor: '#90d759',
   },
 
 
@@ -57,9 +57,10 @@ export default StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 1,
+    backgroundColor: '#fff'
   },
   limparButton: {
-    backgroundColor: '#fff',
+    backgroundColor: '#d20d0e',
     borderRadius: 5,
     justifyContent: 'center',
     alignItems: 'center',
@@ -70,14 +71,14 @@ export default StyleSheet.create({
     witdh: '20%',
   },
   limparButtonText: {
-    color: '#3498db',
+    color: '#fff',
     fontWeight: 'bold',
     fontSize: 12,
   },
 
 
   item: {
-    backgroundColor: '#f9c2ff',
+    backgroundColor: '#e47934',
     padding: 10,
     marginVertical: 1,
     borderRadius: 10,
@@ -86,6 +87,10 @@ export default StyleSheet.create({
   },
   nomeProduto: {
     fontWeight: 'bold',
+  },
+
+  itemSelecionado: {
+    backgroundColor: '#e3731b', 
   },
 
 
@@ -99,14 +104,14 @@ export default StyleSheet.create({
   },
   buttonAtualizar: {
     padding: 5,
-    backgroundColor: 'green',
+    backgroundColor: '#4e6f35',
     borderRadius: 5,
     width: '31%',
     alignItems: 'center',
   },
   buttonEditar: {
     padding: 5,
-    backgroundColor: 'blue',
+    backgroundColor: '#4e6f35',
     borderRadius: 5,
     width: '30%',
     alignItems: 'center',
