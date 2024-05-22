@@ -9,8 +9,6 @@ export default function EditarProduto({ route, navigation }) {
   const [tipoProduto, setTipoProduto] = useState('');
   const [estoqueProduto, setEstoqueProduto] = useState('');
   const [estoqueMinimo, setEstoqueMinimo] = useState('');
-  const [precoCompra, setPrecoCompra] = useState('');
-  const [precoVenda, setPrecoVenda] = useState('');
   const [quantidadeNovaAtualizacao, setQuantidadeNovaAtualizacao] = useState('');
   const [quantidadeUltimaAtualizacao, setQuantidadeUltimaAtualizacao] = useState('');
   const [dataAtualizacaoEstoque, setDataAtualizacaoEstoque] = useState('');
@@ -53,46 +51,44 @@ export default function EditarProduto({ route, navigation }) {
             }
         );
     });
-};
+  };
 
   // Função para carregar quantidade da última operação
-const carregaQuantidadeUltimaOperacao = () => {
-  console.log("Função carregaQuantidadeUltimaOperacao chamada");
-  console.log("ID do produto:", route.params.produto.id_produto);
+  const carregaQuantidadeUltimaOperacao = () => {
+    console.log("Função carregaQuantidadeUltimaOperacao chamada");
+    console.log("ID do produto:", route.params.produto.id_produto);
 
-  db.transaction(transaction => {
-      transaction.executeSql(
-          'SELECT quantidade, data_atualizacao, estoque_atual, preco_compra, preco_venda FROM entrada_saida WHERE id_produto = ? ORDER BY data_atualizacao DESC LIMIT 1',
-          [route.params.produto.id_produto],
-          (_, { rows }) => {
-              console.log("Consulta SQL executada");
-              if (rows.length > 0) {
-                  console.log('Rows found:', rows.length);
-                  const operacao = rows.item(0);
-                  console.log('Dados da última operação:', operacao);
-                  setQuantidadeUltimaAtualizacao(String(operacao.quantidade));
-                  setDataAtualizacaoEstoque(String(operacao.data_atualizacao));
-                  setEstoqueProduto(String(operacao.estoque_atual));
-                  setPrecoCompra(String(operacao.preco_compra));
-                  setPrecoVenda(String(operacao.preco_venda));
-              } else {
-                  console.log('Nenhum resultado encontrado para este id_produto');
-                  setModalMessage('Nenhum resultado encontrado para este id_produto');
-                  setModalVisible(true);
-              }
-          },
-          (_, error) => {
-              console.log('Erro ao carregar quantidade da última operação:', error);
-              setModalMessage('Erro ao carregar quantidade da última operação:', error);
-              setModalVisible(true);
-          }
-      );
-  });
-};
+    db.transaction(transaction => {
+        transaction.executeSql(
+            'SELECT quantidade, data_atualizacao, estoque_atual FROM entrada_saida WHERE id_produto = ? ORDER BY data_atualizacao DESC LIMIT 1',
+            [route.params.produto.id_produto],
+            (_, { rows }) => {
+                console.log("Consulta SQL executada");
+                if (rows.length > 0) {
+                    console.log('Rows found:', rows.length);
+                    const operacao = rows.item(0);
+                    console.log('Dados da última operação:', operacao);
+                    setQuantidadeUltimaAtualizacao(String(operacao.quantidade));
+                    setDataAtualizacaoEstoque(String(operacao.data_atualizacao));
+                    setEstoqueProduto(String(operacao.estoque_atual));
+                } else {
+                    console.log('Nenhum resultado encontrado para este id_produto');
+                    setModalMessage('Nenhum resultado encontrado para este id_produto');
+                    setModalVisible(true);
+                }
+            },
+            (_, error) => {
+                console.log('Erro ao carregar quantidade da última operação:', error);
+                setModalMessage('Erro ao carregar quantidade da última operação:', error);
+                setModalVisible(true);
+            }
+        );
+    });
+  };
 
-const capitalizeFirstLetter = (string) => {
-  return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
-};
+  const capitalizeFirstLetter = (string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+  };
   
   // ========== armazena no banco de dados as informações editadas pelo usuário ==========
   const salvarAlteracoes = () => {
@@ -101,8 +97,6 @@ const capitalizeFirstLetter = (string) => {
 
     //const tipoProdutoUpperCase = tipoProduto.toUpperCase();
     console.log('Id do Produto:', route.params.produto.id_produto);
-    console.log('Preço de Compra:', precoCompra);
-    console.log('Preço de Venda:', precoVenda);
     console.log('Estoque Mínimo:', estoqueMinimo);
     console.log('Nome do Produto:', nomeProduto);
     console.log('Tipo do Produto:', tipoProduto);
@@ -132,19 +126,15 @@ const capitalizeFirstLetter = (string) => {
                 transaction.executeSql(
                     `UPDATE entrada_saida
                     SET quantidade = ?,
-                        estoque_atual = estoque_atual + ?,
-                        preco_compra = ?,
-                        preco_venda = ?
+                        estoque_atual = estoque_atual + ?
                     WHERE id_produto = ? AND data_atualizacao = ?;`,
-                    [quantidade, diferenca, parseFloat(precoCompra), parseFloat(precoVenda), route.params.produto.id_produto, dataAtualizacaoEstoque],
+                    [quantidade, diferenca, route.params.produto.id_produto, dataAtualizacaoEstoque],
                     (_, result) => {
                         transaction.executeSql(
                             `UPDATE estoque
-                            SET estoque_atual = estoque_atual + ?,
-                                ultimo_preco_compra = ?,
-                                ultimo_preco_venda = ?
+                            SET estoque_atual = estoque_atual + ?
                             WHERE id_produto = ?;`,
-                            [diferenca, parseFloat(precoCompra), parseFloat(precoVenda), route.params.produto.id_produto],
+                            [diferenca, route.params.produto.id_produto],
                             (_, result) => {
                                 console.log('Tabela estoque atualizada');
                                 setModalMessage('Transação concluída com sucesso.');
@@ -169,10 +159,9 @@ const capitalizeFirstLetter = (string) => {
     (error) => {
         console.log('Erro na transação geral', error);
     });
-};
+  };
 
 
-  
   //========== modal responsável pelas mensagens da consulta ao banco de dados ==========
   const CustomModal = () => {
     return (
@@ -199,30 +188,6 @@ const capitalizeFirstLetter = (string) => {
       </Modal>
     );
   };
-
-
-  function exibir1() {
-    //console.log('Tipo de Produto:', tipoProduto);
-    if (tipoProduto === 'BEBIDA') {
-      return(
-        <Text style={styles.label}>Preço Última Venda:</Text>
-      )
-    }
-  }
-
-  function exibir2() {
-    //console.log('Tipo de Produto:', tipoProduto);
-    if (tipoProduto === 'BEBIDA') {
-      return(
-        <TextInput
-          style={styles.input}
-          onChangeText={setPrecoVenda}
-          value={precoVenda}
-          keyboardType="numeric"
-        />
-      )
-    }
-  }
 
   // ========== retorno da função ==========
   return (
@@ -267,37 +232,27 @@ const capitalizeFirstLetter = (string) => {
       <Text style={styles.label}>Estoque Mínimo:</Text>
       <TextInput
         style={styles.input}
-        onChangeText={setEstoqueMinimo}
-        value={estoqueMinimo}
-        keyboardType="numeric"
-      />
-      
-      <Text style={styles.label}>Quantidade da Nova Atualização:</Text>
-      <TextInput
-        style={styles.input}
-        onChangeText={setQuantidadeNovaAtualizacao}
-        value={quantidadeNovaAtualizacao}
-        keyboardType="numeric"
-      />
-
-      <Text style={styles.label}>Preço Última Compra:</Text>
-      <TextInput
-        style={styles.input}
-        onChangeText={setPrecoCompra}
-        value={precoCompra}
-        keyboardType="numeric"
-      />
-
-      {exibir1()}
-      {exibir2()}
-      
-      <TouchableOpacity 
-        style={styles.button}
-        onPress={salvarAlteracoes}>
-        <Text style={styles.buttonText}>Salvar Alterações</Text>
-      </TouchableOpacity>
-
-      <CustomModal />
-    </View>
-  );
-}
+          onChangeText={setEstoqueMinimo}
+          value={estoqueMinimo}
+          keyboardType="numeric"
+        />
+        
+        <Text style={styles.label}>Quantidade da Nova Atualização:</Text>
+        <TextInput
+          style={styles.input}
+          onChangeText={setQuantidadeNovaAtualizacao}
+          value={quantidadeNovaAtualizacao}
+          keyboardType="numeric"
+        />
+        
+        <TouchableOpacity 
+          style={styles.button}
+          onPress={salvarAlteracoes}>
+          <Text style={styles.buttonText}>Salvar Alterações</Text>
+        </TouchableOpacity>
+  
+        <CustomModal />
+      </View>
+    );
+  }
+  

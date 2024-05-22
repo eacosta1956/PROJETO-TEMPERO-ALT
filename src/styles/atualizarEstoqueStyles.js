@@ -10,10 +10,17 @@ export default StyleSheet.create({
     input: {
       width: '80%',
       marginTop: 30,
+      marginBottom: 20,
       padding: 10,
       borderWidth: 1,
       borderColor: '#ccc',
       borderRadius: 5,
+    },
+    label: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      marginTop: 10,
+      marginBottom: 5,
     },
     button: {
       width: '80%',
@@ -27,7 +34,7 @@ export default StyleSheet.create({
       fontSize: 18,
       fontWeight: 'bold',
     },
-    centeredView: {
+    modalCenteredView: {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
@@ -48,11 +55,23 @@ export default StyleSheet.create({
       },
       shadowOpacity: 0.25,
       shadowRadius: 4,
-      elevation: 5,
+      elevation: 15,
     },
-    modalText: {
+    modalTitle: {
       marginBottom: 15,
       textAlign: 'center',
     },
+    modalButtons: {
+      flexDirection: 'row',
+      justifyContent: 'space-around',
+      width: '100%',
+    },
+
+
+
+
+
+
+
   });
   

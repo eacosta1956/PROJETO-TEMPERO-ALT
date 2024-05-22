@@ -14,7 +14,7 @@ export default function CadastrarProduto({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
 
-  // lista os produtos que conteem as letras digitadas na TextInput
+  // lista os produtos que contêm as letras digitadas na TextInput
   // --------------------------------------------------------------
   const buscarProdutos = (texto) => {
     db.transaction((transaction) => {

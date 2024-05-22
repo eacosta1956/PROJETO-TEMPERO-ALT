@@ -19,6 +19,7 @@ export default StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
+    marginLeft: 10,
   },
   opcaoTextEstMin: {
     color: '#fff',
@@ -31,7 +32,6 @@ export default StyleSheet.create({
   filtroSelecionado: {
     backgroundColor: '#90d759',
   },
-
 
   opcoesContainerNomeProduto: {
     flexDirection: 'row',
@@ -57,7 +57,8 @@ export default StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 1,
-    backgroundColor: '#fff'
+    backgroundColor: '#fff',
+    marginLeft: 10,
   },
   limparButton: {
     backgroundColor: '#d20d0e',
@@ -84,6 +85,7 @@ export default StyleSheet.create({
     borderRadius: 10,
     marginBottom: 1,
     width: '95%',
+    marginLeft: 10,
   },
   nomeProduto: {
     fontWeight: 'bold',
