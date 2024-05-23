@@ -4,13 +4,13 @@ export default StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
-    backgroundColor: '#f2cd54',
+    backgroundColor: '#ffe58b',
     paddingTop: 10,
     paddingHorizontal: 10,
   },
 
   opcaoButtonEstMin: {
-    backgroundColor: '#4e6f35',
+    backgroundColor: '#476D32',
     borderRadius: 5,
     paddingVertical: 1,
     height: 40,
@@ -30,7 +30,7 @@ export default StyleSheet.create({
     color: '#fff',
   },
   filtroSelecionado: {
-    backgroundColor: '#90d759',
+    backgroundColor: '#403817',
   },
 
   opcoesContainerNomeProduto: {
@@ -79,7 +79,7 @@ export default StyleSheet.create({
 
 
   item: {
-    backgroundColor: '#e47934',
+    backgroundColor: '#f9904c',
     padding: 10,
     marginVertical: 1,
     borderRadius: 10,
@@ -92,7 +92,7 @@ export default StyleSheet.create({
   },
 
   itemSelecionado: {
-    backgroundColor: '#e3731b', 
+    backgroundColor: '#ff6400', 
   },
 
 

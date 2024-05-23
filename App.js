@@ -40,15 +40,15 @@ export default function App() {
       >
         <Stack.Screen name="Home" component={Home} options={{ title: 'Controle de Estoque' }} />
         <Stack.Screen name="ApagarDados" component={ApagarDados} />
-        <Stack.Screen name="AtualizarEstoque" component={AtualizarEstoque} />
-        <Stack.Screen name="CadastrarProduto" component={CadastrarProduto} />
-        <Stack.Screen name="EditarProduto" component={EditarProduto} />
-        <Stack.Screen name="ExcluirProduto" component={ExcluirProduto} />
-        <Stack.Screen name="GerarRelatorios" component={GerarRelatorios} />
+        <Stack.Screen name="AtualizarEstoque" component={AtualizarEstoque} options={{ title: 'Atualizar Estoque'}}/>
+        <Stack.Screen name="CadastrarProduto" component={CadastrarProduto} options={{ title: 'Cadastrar Produto'}} />
+        <Stack.Screen name="EditarProduto" component={EditarProduto} options={{ title: 'Editar Produto'}} />
+        <Stack.Screen name="ExcluirProduto" component={ExcluirProduto} options={{ title: 'Excluir Produto'}}/>
+        <Stack.Screen name="GerarRelatorios" component={GerarRelatorios} options={{ title: 'Gerar Relatórios'}}/>
         <Stack.Screen name="ListarProdutos" component={ListarProdutos} options={{ title: 'Produtos Cadastrados' }} />
-        <Stack.Screen name="RelatorioEntradasSaidas" component={RelatorioEntradasSaidas} />
-        <Stack.Screen name="RelatorioDespesas" component={RelatorioDespesas} />
-        <Stack.Screen name="RelatorioLucro" component={RelatorioLucro} />
+        <Stack.Screen name="RelatorioEntradasSaidas" component={RelatorioEntradasSaidas} options={{ title: 'Relatório de Entrada e Saída'}} />
+        <Stack.Screen name="RelatorioDespesas" component={RelatorioDespesas} options={{ title: 'Relatório de Despesas'}} />
+        <Stack.Screen name="RelatorioLucro" component={RelatorioLucro} options={{ title: 'Relatório de Lucro'}}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

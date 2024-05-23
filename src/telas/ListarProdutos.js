@@ -144,8 +144,8 @@ export default function ListarProdutos({ navigation }) {
     >
     {/* ==================================================== */}
      
-      <Text style={styles.nomeProduto}>Nome: {item.nome_produto}</Text>
-      <Text>Tipo: {item.tipo_produto}</Text>
+      <Text style={styles.nomeProduto}>{item.nome_produto}</Text>
+      <Text>{item.tipo_produto}</Text>
       <Text>Estoque Atual: {item.estoque_atual}</Text>
       <Text>Estoque Mínimo: {item.estoque_minimo}</Text>
     </TouchableOpacity>
