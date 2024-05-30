@@ -4,7 +4,7 @@ import { db } from '../database/AbreConexao';
 import styles from '../styles/editarProdutoStyles';
 
 export default function EditarProduto({ route, navigation }) {
-  const [produto, setProduto] = useState(null);
+  //const [produto, setProduto] = useState(null);
   const [nomeProduto, setNomeProduto] = useState('');
   const [tipoProduto, setTipoProduto] = useState('');
   const [estoqueProduto, setEstoqueProduto] = useState('');
@@ -16,8 +16,9 @@ export default function EditarProduto({ route, navigation }) {
   const [modalMessage, setModalMessage] = useState('');
   const [operacaoSucesso, setOperacaoSucesso] = useState(false);
 
-  // ========== mostra na tela os dados do produto selecionado na tela 'listar produtos' ==========
-  // ========== mostra na tela a quantidade da última atualização ==========
+  /* Hook useEffect para carregar informações do produto e a quantidade da última
+     operação, quando o componente é montado ou quando os parâmetros da rota mudam.*/
+  // --------------------------------------------------------------------------------
   useEffect(() => {
     if (route.params && route.params.produto) {
       carregaInformacoesProduto();
@@ -25,7 +26,9 @@ export default function EditarProduto({ route, navigation }) {
     }
   }, [route.params]);
 
-  // ===== busca na tabela produtos, o nome do produto, o tipo do produto e o estoque mínimo =====
+  /* Função: consulta a tabela produtos para obter informações sobre
+     o produto específico e atualiza os estados correspondentes.
+     ----------------------------------------------------------- */
   const carregaInformacoesProduto = () => {
     db.transaction((transaction) => {
         transaction.executeSql(
@@ -37,15 +40,15 @@ export default function EditarProduto({ route, navigation }) {
                     setNomeProduto(produto.nome_produto);
                     setTipoProduto(produto.tipo_produto);
                     setEstoqueMinimo(String(produto.estoque_minimo));
-                    console.log('Informações do produto carregadas:', produto);
+                    
                 } else {
-                    console.log('Nenhum produto encontrado com o id especificado.');
+                    
                     setModalMessage('Nenhum produto encontrado com o id especificado.');
                     setModalVisible(true);
                 }
             },
             (_, error) => {
-                console.log('Erro ao carregar informações do produto:', error);
+                
                 setModalMessage('Erro ao carregar informações do produto:', error);
                 setModalVisible(true);
             }
@@ -53,10 +56,10 @@ export default function EditarProduto({ route, navigation }) {
     });
   };
 
-  // Função para carregar quantidade da última operação
+  /* Função: Consulta a tabela entrada_saida para obter a quantidade da
+     última operação do produto e atualiza os estados correspondentes.
+     ----------------------------------------------------------------- */
   const carregaQuantidadeUltimaOperacao = () => {
-    console.log("Função carregaQuantidadeUltimaOperacao chamada");
-    console.log("ID do produto:", route.params.produto.id_produto);
 
     db.transaction(transaction => {
         transaction.executeSql(
@@ -86,22 +89,19 @@ export default function EditarProduto({ route, navigation }) {
     });
   };
 
+  
+  /* Função: Capitaliza a primeira letra de uma string, usada para formatar o tipo do produto.
+     ----------------------------------------------------------------------------------------- */
   const capitalizeFirstLetter = (string) => {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
   };
   
-  // ========== armazena no banco de dados as informações editadas pelo usuário ==========
+  /* Função: Atualiza as três tabelas do banco de dados (produtos, entrada_saida e estoque),
+     com as alterações feitas pelo usuário.
+     --------------------------------------------------------------------------------------- */
   const salvarAlteracoes = () => {
     const nomeProdutoUpperCase = nomeProduto.toUpperCase();
     let tipoProdutoFormatado = capitalizeFirstLetter(tipoProduto);
-
-    //const tipoProdutoUpperCase = tipoProduto.toUpperCase();
-    console.log('Id do Produto:', route.params.produto.id_produto);
-    console.log('Estoque Mínimo:', estoqueMinimo);
-    console.log('Nome do Produto:', nomeProduto);
-    console.log('Tipo do Produto:', tipoProduto);
-    //console.log('Nova quantidade:', novaQuantidade);
-    console.log('Estoque Atual:', estoqueProduto);
 
     db.transaction((transaction) => {
         transaction.executeSql(
@@ -136,33 +136,40 @@ export default function EditarProduto({ route, navigation }) {
                             WHERE id_produto = ?;`,
                             [diferenca, route.params.produto.id_produto],
                             (_, result) => {
-                                console.log('Tabela estoque atualizada');
+                                
                                 setModalMessage('Transação concluída com sucesso.');
                                 setOperacaoSucesso(true);
                                 setModalVisible(true);
                             },
                             (_, error) => {
-                                console.log('Erro na atualização do estoque', error);
+                                setModalMessage('Erro na atualização do estoque', error);
+                                setModalVisible(true);
                             }
                         );
                     },
                     (_, error) => {
-                        console.log('Erro na atualização da entrada_saida', error);
+                        setModalMessage('Erro na atualização da entrada_saida', error);
+                        setModalVisible(true);
                     }
                 );
             },
             (_, error) => {
-                console.log('Erro na atualização de produtos', error);
+                setModalMessage('Erro na atualização de produtos', error);
+                setModalVisible(true);
             }
         );
     }, 
     (error) => {
-        console.log('Erro na transação geral', error);
+        setModalMessage('Erro na transação geral', error);
+        setModalVisible(true);
     });
   };
 
 
-  //========== modal responsável pelas mensagens da consulta ao banco de dados ==========
+  
+  /* Modal: exibe mensagens ao usuário, incluindo a navegação de volta para 
+     a lista de produtos, após uma operação bem-sucedida.
+     ---------------------------------------------------------------------- */
   const CustomModal = () => {
     return (
       <Modal
@@ -189,7 +196,9 @@ export default function EditarProduto({ route, navigation }) {
     );
   };
 
-  // ========== retorno da função ==========
+  /* Monta a interface do usuário, incluindo campos de entrada para editar informações do produto e 
+     um botão para salvar alterações, além de exibir o modal conforme necessário.
+     ---------------------------------------------------------------------------------------------- */
   return (
     <View style={styles.container}>
       <View style={styles.infoContainer}>

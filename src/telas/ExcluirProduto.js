@@ -8,11 +8,12 @@ export default function ExcluirProduto({ route, navigation }) {
   const [modalVisible, setModalVisible] = useState(false);  
   const [modalMessage, setModalMessage] = useState('');
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
-  const [modalType, setModalType] = useState(null);
+  const [tipoModal, setTipoModal] = useState(null);
   const [operacaoSucesso, setOperacaoSucesso] = useState(false);
 
-  // Hook acionado quando a tela ExcluirProduto é carregada
-  // ------------------------------------------------------
+  /* Hook useEffect: Executa quando o componente é montado ou quando os parâmetros
+     da rota mudam, carregando os detalhes do produto passado pela navegação.
+     ----------------------------------------------------------------------------- */
   useEffect(() => {
     // Obtém o produto passado pela navegação
     if (route.params && route.params.produto) {
@@ -20,23 +21,25 @@ export default function ExcluirProduto({ route, navigation }) {
     }
   }, [route.params]);
     
-  // Acionada quando o botão 'Excluir Produto' é pressionado. Carrega um modal
-  // -------------------------------------------------------------------------
+  /* Função: Define o tipo de modal como 'confirm', o que aciona a exibição do modal de confirmação.
+     ----------------------------------------------------------------------------------------------- */
   const confirmarExclusao = () => {
-    setModalType('confirm');
+    setTipoModal('confirm');
   };
 
-  // Acionada quando o usuário confirma, no modal, a exclusão do produto
-  // -------------------------------------------------------------------
+  /* Função: Executa a exclusão do produto do banco de dados em duas etapas:
+     - exclui o produto da tabela produtos.
+     - exclui o produto da tabela estoque, se a primeira exclusão for bem-sucedida.
+     Atualiza os estados modalMessage, tipoModal e operacaoSucesso, com base no
+     resultado da operação.
+     ----------------------------------------------------------------------------- */
   const excluirProduto = () => {
     if (!produto) {
       setModalMessage('Produto não encontrado.');
-      setModalType(null);
+      setTipoModal(null);
       return;
     }
 
-    // Exclui o produto da tabela produtos
-    // -----------------------------------
     db.transaction((transaction) => {
       transaction.executeSql(
         `DELETE FROM produtos WHERE id_produto = ?;`,
@@ -44,47 +47,46 @@ export default function ExcluirProduto({ route, navigation }) {
         (_, { rowsAffected }) => {
           if (rowsAffected > 0) {
 
-            // Exclui o produto da tabela estoque
-            // ----------------------------------
             transaction.executeSql(
               `DELETE FROM estoque WHERE id_produto = ?;`,
               [produto.id_produto],
               (_, { rowsAffected: rowsAffectedEstoque }) => {
                 if (rowsAffectedEstoque > 0) {
                   setModalMessage('Produto excluído com sucesso!');
-                  setModalType('message');
+                  setTipoModal('message');
                   setOperacaoSucesso(true);
                 } else {
                   setModalMessage('Erro ao excluir produto do estoque.');
-                  setModalType('message');
+                  setTipoModal('message');
                 }
               },
               (_, error) => {
                 setModalMessage('Erro ao excluir produto do estoque atual: ' + error);
-                setModalType('message');
+                setTipoModal('message');
               }
             ); 
           } else {
             setModalMessage('Erro ao excluir produto.');
-            setModalType('message');
+            setTipoModal('message');
           }
         },
         (_, error) => {
           setModalMessage('Erro ao excluir produto: ' + error);
-          setModalType('message');
+          setTipoModal('message');
         }
       );
     });
   };
 
-  // modal de mensagem da consulta ao banco de dados
-  // -----------------------------------------------
-  const CustomModal = () => {
+  /* Modal: Exibe um modal de mensagem com base no tipoModal definido. 
+     Navega de volta para a lista de produtos se a operação foi bem-sucedida.
+     ------------------------------------------------------------------------ */
+  const ModalPersonalizado = () => {
     return (
       <Modal
         animationType="slide"
         transparent={true}
-        visible={modalType === 'message'}
+        visible={tipoModal === 'message'}
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.centeredView}>
@@ -105,8 +107,13 @@ export default function ExcluirProduto({ route, navigation }) {
     );
   };
 
-  // Retorno da função principal
-  // ---------------------------
+  /* Renderização:
+     Exibe informações do produto.
+     Botão "Excluir Produto" aciona o modal de confirmação.
+     Modal de Confirmação: Exibe um modal perguntando ao usuário se deseja excluir 
+     o produto, com botões para confirmar ou cancelar a exclusão.
+     ModalPersonalizado: Exibe mensagens de sucesso ou erro após a tentativa de exclusão. 
+    ------------------------------------------------------------------------------------- */
   return (
     <View style={styles.container}>
       <View>
@@ -129,7 +136,7 @@ export default function ExcluirProduto({ route, navigation }) {
       <Modal
         animationType="slide"
         transparent={true}
-        visible={modalType === 'confirm'}
+        visible={tipoModal === 'confirm'}
         onRequestClose={() => setConfirmModalVisible(false)}
       >
         <View style={styles.centeredView}>
@@ -143,7 +150,10 @@ export default function ExcluirProduto({ route, navigation }) {
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.buttonModal, styles.buttonModalCancel]}
-                onPress={() => setModalType(null)}
+                onPress={() => {
+                  setTipoModal(null);
+                  navigation.navigate('ListarProdutos');
+                }}
               >
                 <Text style={styles.buttonText}>Cancelar</Text>
               </TouchableOpacity>
@@ -152,7 +162,7 @@ export default function ExcluirProduto({ route, navigation }) {
         </View>
       </Modal>
 
-      <CustomModal />
+      <ModalPersonalizado />
 
     </View>
   );

@@ -4,6 +4,8 @@ import { db } from '../database/AbreConexao';
 import styles from '../styles/atualizarEstoqueStyles';
 
 export default function AtualizarEstoque({ route, navigation }) {
+  // Estados para armazenar informações sobre o produto, quantidade, visibilidade do modal e mensagens
+  // -------------------------------------------------------------------------------------------------
   const [produto, setProduto] = useState(null);
   const [quantidade, setQuantidade] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
@@ -12,6 +14,8 @@ export default function AtualizarEstoque({ route, navigation }) {
   const [operacao, setOperacao] = useState('');
   const [modalMessage, setModalMessage] = useState('');
 
+  // Efeito para definir o produto quando os parâmetros da rota mudam
+  // ----------------------------------------------------------------
   useEffect(() => {
     if (route.params && route.params.produto) {
       setProduto(route.params.produto);
@@ -19,7 +23,13 @@ export default function AtualizarEstoque({ route, navigation }) {
     }
   }, [route.params]);
 
+  // Função para salvar a movimentação de estoque no banco de dados
+  // --------------------------------------------------------------
   const salvarMovimentacaoEstoque = (preco) => {
+
+    // comandos para transformar a data do sistema, que está no padrão dia/mês/ano, para 
+    // o padrão ano/mês/dia, de modo a possibilitar operações com data no SQLite
+    // ---------------------------------------------------------------------------------
     const currentDate = new Date();
     const year = currentDate.getFullYear();
     const month = String(currentDate.getMonth() + 1).padStart(2, '0');
@@ -29,9 +39,15 @@ export default function AtualizarEstoque({ route, navigation }) {
     const seconds = String(currentDate.getSeconds()).padStart(2, '0');
     const formattedDateTime = `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
 
+    // se o usuário pressionar o botão Adicionar, a quantidade a ser armazenada será positiva
+    // caso contrário, negativa
+    // --------------------------------------------------------------------------------------
     const qtdInt = parseInt(quantidade);
     const qtdMovimentada = operacao === 'adicionar' ? qtdInt : -qtdInt;
 
+    // em uma operação de adição ao estoque, o usuário preencherá somente o preço de compra
+    // o preço de venda será preenchido somente quando se tratar de retirada de bebidas
+    // ------------------------------------------------------------------------------------
     db.transaction((transaction) => {
       let precoCompra = 0;
       let precoVenda = 0;
@@ -44,6 +60,8 @@ export default function AtualizarEstoque({ route, navigation }) {
         precoCompra = 0;
       }
 
+      // Primeiro passo: buscar o estoque atual do produto na tabela estoque
+      // -------------------------------------------------------------------
       transaction.executeSql(
         'SELECT estoque_atual FROM estoque WHERE id_produto = ?',
         [produto.id_produto],
@@ -51,6 +69,8 @@ export default function AtualizarEstoque({ route, navigation }) {
           const estoqueAtual = rows._array[0].estoque_atual;
           const novoEstoqueAtual = estoqueAtual + qtdMovimentada;
 
+          // Atualiza o estoque com a nova quantidade, data de atualização e preço unitário da operação
+          // ------------------------------------------------------------------------------------------
           transaction.executeSql(
             `UPDATE estoque 
             SET estoque_atual = ?, 
@@ -63,6 +83,8 @@ export default function AtualizarEstoque({ route, navigation }) {
               if (rowsAffected > 0) {
                 atualizarProdutoSelecionado(produto.id_produto);
 
+                // Insere a movimentação na tabela entrada_saida
+                // ---------------------------------------------
                 transaction.executeSql(
                   `INSERT INTO entrada_saida (id_produto, quantidade, data_atualizacao, estoque_atual, preco_compra, preco_venda) VALUES (?, ?, ?, ?, ?, ?);`,
                   [produto.id_produto, qtdMovimentada, formattedDateTime, novoEstoqueAtual, precoCompra, precoVenda],
@@ -98,6 +120,8 @@ export default function AtualizarEstoque({ route, navigation }) {
     });
   };
 
+  // Função para atualizar o produto selecionado no estado após UPDATE na tabela estoque
+  // -----------------------------------------------------------------------------------
   const atualizarProdutoSelecionado = (id_produto) => {
     db.transaction((transaction) => {
       transaction.executeSql(
@@ -114,7 +138,9 @@ export default function AtualizarEstoque({ route, navigation }) {
     });
   };
 
-  const handleModalConfirm = () => {
+  // Função para confirmar a entrada do valor no modal
+  // -------------------------------------------------
+  const confirmarModal = () => {
     if (!isNaN(parseFloat(modalInputValue))) {
       salvarMovimentacaoEstoque(modalInputValue);
     } else {
@@ -123,7 +149,9 @@ export default function AtualizarEstoque({ route, navigation }) {
     }
   };
 
-  const handleModalCancel = () => {
+  // Função para cancelar a operação no modal
+  // ----------------------------------------
+  const cancelarModal= () => {
     setModalVisible(false);
     setModalMessage('');
     setQuantidade(''); // Limpar a quantidade
@@ -131,7 +159,9 @@ export default function AtualizarEstoque({ route, navigation }) {
     navigation.navigate('ListarProdutos'); // Navegar de volta para a tela de listagem de produtos
   };
 
-  const handleRetirarPress = () => {
+  // Função para lidar com a retirada de produto do estoque
+  // ------------------------------------------------------
+  const retirarProduto= () => {
     const qtdInt = parseInt(quantidade);
     if (qtdInt > 0) {
       if (qtdInt <= produto.estoque_atual) {
@@ -152,7 +182,9 @@ export default function AtualizarEstoque({ route, navigation }) {
     }
   };
 
-  const handleModalClose = () => {
+  // Função para fechar o modal
+  // --------------------------
+  const fecharModal= () => {
     setModalVisible(false);
     setModalMessage('');
 
@@ -184,6 +216,8 @@ export default function AtualizarEstoque({ route, navigation }) {
         onChangeText={(text) => setQuantidade(text)}
       />
 
+      {/* Botão para adicionar produto ao estoque */}
+      {/* --------------------------------------- */}
       <TouchableOpacity
         style={[styles.button, { backgroundColor: '#27ae60' }]}
         onPress={() => {
@@ -201,13 +235,17 @@ export default function AtualizarEstoque({ route, navigation }) {
         <Text style={styles.buttonText}>Adicionar</Text>
       </TouchableOpacity>
 
+      {/* Botão para retirar produto do estoque */}
+      {/* ------------------------------------- */}
       <TouchableOpacity
         style={[styles.button, { backgroundColor: '#e74c3c' }]}
-        onPress={handleRetirarPress}
+        onPress={retirarProduto}
       >
         <Text style={styles.buttonText}>Retirar</Text>
       </TouchableOpacity>
 
+      {/* Modal para confirmar a operação de adicionar ou retirar */}
+      {/* ------------------------------------------------------- */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -221,38 +259,39 @@ export default function AtualizarEstoque({ route, navigation }) {
             <Text>Quantidade: <Text style={styles.modalText}>{quantidade}</Text></Text>
             {operacao && (operacao === 'adicionar' || (operacao === 'retirar' && produto.tipo_produto === 'Bebida')) && (
               <>
-              <Text style={styles.label}>{operacao === 'adicionar' ? "Preço de Compra" : "Preço de Venda"}</Text>
-              <TextInput
-                style={styles.input}
-                placeholder={operacao === 'adicionar' ? "Preço de Compra" : "Preço de Venda"}
-                keyboardType="numeric"
-                value={modalInputValue}
-                onChangeText={(text) => setModalInputValue(text)}
-              />
+                <Text style={styles.label}>{operacao === 'adicionar' ? "Preço de Compra" : "Preço de Venda"}</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder={operacao === 'adicionar' ? "Preço de Compra" : "Preço de Venda"}
+                  keyboardType="numeric"
+                  value={modalInputValue}
+                  onChangeText={(text) => setModalInputValue(text)}
+                />
               </>
             )}
             <View style={styles.modalButtons}>
-              <Button title="OK" onPress={handleModalConfirm} color="#27ae60" />
-              <Button title="Cancelar" onPress={handleModalCancel} color="#e74c3c" />
+              <Button title="OK" onPress={confirmarModal} color="#27ae60" />
+              <Button title="Cancelar" onPress={cancelarModal} color="#e74c3c" />
             </View>
           </View>
         </View>
       </Modal>
 
+      {/* Modal para mensagens de erro ou de sucesso */}
+      {/* ------------------------------------------ */}
       <Modal
         animationType="slide"
         transparent={true}
         visible={modalMessage !== ''}
-        onRequestClose={handleModalClose}
+        onRequestClose={fecharModal}
       >
         <View style={styles.modalCenteredView}>
           <View style={styles.modalView}>
             <Text style={styles.modalText}>{modalMessage}</Text>
-            <Button title="OK" onPress={handleModalClose} />
+            <Button title="OK" onPress={fecharModal} />
           </View>
         </View>
       </Modal>
     </View>
   );
 }
-
