@@ -14,8 +14,8 @@ export default function CadastrarProduto({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
 
-  // lista os produtos que contêm as letras digitadas na TextInput
-  // --------------------------------------------------------------
+  // Função para buscar produtos que contenham as letras digitadas na TextInput
+  // --------------------------------------------------------------------------
   const buscarProdutos = (texto) => {
     db.transaction((transaction) => {
       transaction.executeSql(
@@ -33,8 +33,8 @@ export default function CadastrarProduto({ navigation }) {
     });
   };
   
-  // não permite o cadastro de produtos duplicados
-  // ---------------------------------------------
+  // Função para verificar duplicatas no banco de dados
+  // --------------------------------------------------
   const verificarDuplicata = (nomeProduto) => {
     return new Promise((resolve, reject) => {
       db.transaction((transaction) => {
@@ -58,8 +58,8 @@ export default function CadastrarProduto({ navigation }) {
     });
   };
   
-  // armazena o produto no banco de dados
-  // ------------------------------------
+  // Função para salvar o produto no banco de dados
+  // ----------------------------------------------
   const salvarProduto = async () => {
     if (!descricaoProduto || !estoqueMinimo || !tipoProduto) {
       setModalMessage('Preencha todos os campos!');
@@ -133,8 +133,9 @@ export default function CadastrarProduto({ navigation }) {
     }
   };
 
-  //========== modal para mensagens ==========
-  const CustomModal = () => {
+  // Componente de Modal para exibir mensagens
+  // -----------------------------------------
+  const ModalPersonalizado = () => {
     return (
       <Modal
         animationType="slide"
@@ -157,7 +158,8 @@ export default function CadastrarProduto({ navigation }) {
     );
   };
 
-  //========== retorno da função ==========
+  // Renderização da interface do usuário
+  // ------------------------------------
   return (
     <View style={styles.container}>
       <TextInput
@@ -234,7 +236,7 @@ export default function CadastrarProduto({ navigation }) {
         </TouchableOpacity>
       </View>
 
-      <CustomModal />
+      <ModalPersonalizado />
       
     </View>
   );

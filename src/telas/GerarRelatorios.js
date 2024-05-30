@@ -5,11 +5,13 @@ import styles from '../styles/gerarRelatoriosStyles';
 
 export default function GerarRelatorios() {
     const navigation = useNavigation();
-    const [startDate, setStartDate] = useState('');
-    const [endDate, setEndDate] = useState('');
+    const [dataInicial, setDataInicial] = useState('');
+    const [dataFinal, setDataFinal] = useState('');
 
-    const handleInputChange = (text, setDate) => {
-        const cleanedText = text.replace(/\D/g, ''); // Remove non-numeric characters
+    //Função para lidar com a entrada de texto e formatar as datas inseridas.
+    // ---------------------------------------------------------------------
+    const lidarEntradaDeTexto = (text, setDate) => {
+        const cleanedText = text.replace(/\D/g, ''); // Remove caracteres não numéricos
         const maxLength = 8;
         const formattedText = cleanedText.slice(0, maxLength);
 
@@ -24,10 +26,15 @@ export default function GerarRelatorios() {
         setDate(formattedDate);
     };
 
+    // Função para navegar para diferentes tipos de relatórios com as datas fornecidas.
+    // --------------------------------------------------------------------------------
     const navigateToRelatorio = (tipo) => {
-        navigation.navigate(tipo, { startDate, endDate });
+        navigation.navigate(tipo, { dataInicial, dataFinal });
     };
 
+    /* Renderiza a interface do usuário, incluindo os campos de entrada de texto para as datas 
+       inicial e final, e os botões para emitir diferentes tipos de relatórios.
+       --------------------------------------------------------------------------------------- */
     return (
         <View style={styles.container}>
             <View style={styles.topContainer}>
@@ -37,8 +44,8 @@ export default function GerarRelatorios() {
                     <TextInput
                         style={styles.input}
                         placeholder="AAAA/MM/DD"
-                        onChangeText={(text) => handleInputChange(text, setStartDate)}
-                        value={startDate}
+                        onChangeText={(text) => lidarEntradaDeTexto(text, setDataInicial)}
+                        value={dataInicial}
                         keyboardType="numeric"
                         maxLength={10}
                     />
@@ -48,8 +55,8 @@ export default function GerarRelatorios() {
                     <TextInput
                         style={styles.input}
                         placeholder="AAAA/MM/DD"
-                        onChangeText={(text) => handleInputChange(text, setEndDate)}
-                        value={endDate}
+                        onChangeText={(text) => lidarEntradaDeTexto(text, setDataFinal)}
+                        value={dataFinal}
                         keyboardType="numeric"
                         maxLength={10}
                     />

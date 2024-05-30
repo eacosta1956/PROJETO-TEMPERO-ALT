@@ -1,38 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Modal, FlatList, TouchableOpacity } from 'react-native';
-import { db } from '../database/AbreConexao';
-import styles from '../styles/relatorioEntradasSaidasStyles';
+import { db } from '../database/AbreConexao'; // Importação do módulo de banco de dados
+import styles from '../styles/relatorioEntradasSaidasStyles'; // Importação do arquivo de estilos
 
 export default function RelatorioEntradasSaidas({ route, navigation }) {
-    const { startDate, endDate } = route.params;
-    const [relatorio, setRelatorio] = useState([]);
-    const [modalVisible, setModalVisible] = useState(true);
-    const [modalErrorVisible, setModalErrorVisible] = useState(false);
+    const { dataInicial, dataFinal } = route.params; // Extração dos parâmetros dataInicial e dataFinal do objeto de navegação
+    const [relatorio, setRelatorio] = useState([]); // Estado para armazenar o relatório de entradas e saídas
+    const [isLoading, setIsLoading] = useState(true); // Estado para rastrear se os dados estão sendo carregados
+    const [modalVisible, setModalVisible] = useState(false); // Estado para controlar a visibilidade do modal principal
+    const [modalErrorVisible, setModalErrorVisible] = useState(false); // Estado para controlar a visibilidade do modal de erro
 
-    const validarDatas = () => {
-        const dateRegex = /^\d{4}\/\d{2}\/\d{2}$/;
-        if (!dateRegex.test(startDate) || !dateRegex.test(endDate)) {
-            setModalErrorVisible(true);
-            return false;
-        }
-        return true;
-    };
-
+    // Função para fechar o modal de erro e voltar para a tela anterior
     const fecharModalErro = () => {
-        setModalErrorVisible(false);
-        navigation.goBack();
+        setModalErrorVisible(false); // Oculta o modal de erro
+        navigation.goBack(); // Navega de volta para a tela anterior
     };
 
+    // Função para fechar o modal principal e navegar de volta para a tela inicial
     const fecharModal = () => {
-        setModalVisible(false);
-        navigation.navigate('Home');
+        setModalVisible(false); // Oculta o modal principal
+        navigation.navigate('Home'); // Navega para a tela inicial
     };
 
+    // Função para gerar o relatório de entradas e saídas
     const gerarRelatorio = () => {
-        if (!validarDatas()) {
-            return;
-        }
-
+        // Consulta SQL para obter o relatório de entradas e saídas dentro do período especificado
         db.transaction((transaction) => {
             transaction.executeSql(
                 `SELECT 
@@ -45,46 +37,61 @@ export default function RelatorioEntradasSaidas({ route, navigation }) {
                  WHERE e.data_atualizacao >= ? || ' 00:00:00' AND e.data_atualizacao <= ? || ' 23:59:59'
                  GROUP BY e.id_produto
                  ORDER BY p.nome_produto ASC;`,
-                [startDate, endDate],
+                [dataInicial, dataFinal], // Parâmetros da consulta SQL
                 (_, { rows }) => {
-                    const relatorioProdutos = rows._array;
-                    setRelatorio(relatorioProdutos);
+                    const relatorioProdutos = rows._array; // Armazena o relatório obtido em um array
+                    setRelatorio(relatorioProdutos); // Atualiza o estado do relatório com os dados obtidos
+                    setIsLoading(false); // Define o estado de carregamento como falso após obter os dados
+                    setModalVisible(true); // Mostra o modal principal
                 },
                 (_, error) => {
-                    console.log('Erro ao gerar relatório:', error);
+                    console.log('Erro ao gerar relatório:', error); // Registra erros ocorridos durante a geração do relatório
+                    setIsLoading(false); // Define o estado de carregamento como falso mesmo em caso de erro
+                    setModalErrorVisible(true); // Mostra o modal de erro
                 }
             );
         });
     };
 
+    // Efeito useEffect para gerar o relatório ao carregar o componente
     useEffect(() => {
-        gerarRelatorio();
-    }, []);
+        gerarRelatorio(); // Chama a função para gerar o relatório
+    }, []); // Array vazio de dependências indica que o efeito é executado apenas uma vez, após a montagem do componente
 
     return (
         <View style={styles.container}>
+            {/* Modal principal */}
             <Modal animationType="slide" transparent={true} visible={modalVisible}>
                 <View style={styles.modalContainer}>
                     <View style={styles.modalContent}>
                         <Text style={styles.headerText}>Relatório de Entradas e Saídas</Text>
-                        <Text style={styles.dateText}>Período: {startDate} a {endDate}</Text>
-                        {relatorio.length > 0 ? (
-                        <FlatList
-                            data={relatorio}
-                            keyExtractor={(item) => item.id_produto.toString()}
-                            renderItem={({ item }) => (
-                                <View style={styles.itemContainer}>
-                                    <Text style={styles.itemText}>
-                                        Produto: <Text style={styles.productName}>{item.nome_produto}</Text>
-                                    </Text>
-                                    <Text>Entradas: {item.total_entradas}</Text>
-                                    <Text>Saídas: {item.total_saidas}</Text>
-                                    <Text>Diferença: {item.total_entradas - item.total_saidas}</Text>
-                                </View>
-                            )}
-                        />) : (
-                            <Text style={styles.errorMessage}>Não há dados para exibir.</Text>
+                        <Text style={styles.dateText}>Período: {dataInicial} a {dataFinal}</Text>
+                        
+                        {/* Verifica se os dados estão sendo carregados */}
+                        {isLoading ? (
+                            <Text>Carregando...</Text> // Indicador de carregamento
+                        ) : (
+                            relatorio.length > 0 ? (
+                                <FlatList
+                                    data={relatorio} // Dados a serem exibidos na lista
+                                    keyExtractor={(item) => item.id_produto.toString()} // Função para extrair chaves únicas dos itens da lista
+                                    renderItem={({ item }) => ( // Função para renderizar cada item da lista
+                                        <View style={styles.itemContainer}>
+                                            <Text style={styles.itemText}>
+                                                Produto: <Text style={styles.productName}>{item.nome_produto}</Text>
+                                            </Text>
+                                            <Text>Entradas: {item.total_entradas}</Text>
+                                            <Text>Saídas: {item.total_saidas}</Text>
+                                            <Text>Diferença: {item.total_entradas - item.total_saidas}</Text>
+                                        </View>
+                                    )}
+                                />
+                            ) : (
+                                <Text style={styles.errorMessage}>Não há dados para exibir.</Text> // Mensagem de erro caso não haja dados no relatório
+                            )
                         )}
+                        
+                        {/* Botão para fechar o modal */}
                         <TouchableOpacity style={styles.closeButton} onPress={fecharModal}>
                             <Text style={styles.buttonText}>Fechar</Text>
                         </TouchableOpacity>
@@ -92,11 +99,14 @@ export default function RelatorioEntradasSaidas({ route, navigation }) {
                 </View>
             </Modal>
 
+            {/* Modal de erro */}
             <Modal animationType="slide" transparent={true} visible={modalErrorVisible}>
                 <View style={styles.modalContainer}>
                     <View style={styles.modalContent}>
                         <Text style={styles.headerText}>Erro</Text>
                         <Text style={styles.errorMessage}>Por favor, insira uma data válida no formato AAAA/MM/DD.</Text>
+                        
+                        {/* Botão para fechar o modal de erro */}
                         <TouchableOpacity style={styles.closeButton} onPress={fecharModalErro}>
                             <Text style={styles.buttonText}>Fechar</Text>
                         </TouchableOpacity>

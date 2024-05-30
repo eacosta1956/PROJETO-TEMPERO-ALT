@@ -14,10 +14,14 @@ export default function ListarProdutos({ navigation }) {
   const [filtroTipoProduto, setFiltroTipoProduto] = useState('');
   const [filtroEstoqueMinimo, setFiltroEstoqueMinimo] = useState(false);
 
+  // Carrega produtos ao iniciar o componente ou quando os filtros são alterados
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     carregarProdutos();
   }, [filtroEstoqueMinimo, filtroNomeProduto, filtroTipoProduto] );
 
+  // Carregar totais ao focar na tela
+  // --------------------------------
   useFocusEffect(
     React.useCallback(() => {
       carregarTotais();
@@ -28,6 +32,8 @@ export default function ListarProdutos({ navigation }) {
     }, [])
   );
 
+  // Função para carregar o total de produtos e o total de produtos com estoque mínimo
+  // ---------------------------------------------------------------------------------
   const carregarTotais = () => {
     db.transaction((transaction) => {
       transaction.executeSql(
@@ -58,6 +64,8 @@ export default function ListarProdutos({ navigation }) {
     });
   };
 
+  // Função para carregar a lista de produtos na tela com base nos filtros
+  // ---------------------------------------------------------------------
   const carregarProdutos = () => {
     db.transaction((transaction) => {
       let query = `SELECT p.id_produto, p.nome_produto, p.estoque_minimo, e.estoque_atual, p.tipo_produto 
@@ -92,7 +100,9 @@ export default function ListarProdutos({ navigation }) {
     });
   };
   
-  const handleSelecionarProduto = (produto) => {
+  // Função para selecionar um produto listado na tela
+  // -------------------------------------------------
+  const selecionarProduto = (produto) => {
     if (produto.id_produto === itemSelecionado) {
       setSelectedItem(null);
       setProdutoSelecionado(null);
@@ -102,50 +112,63 @@ export default function ListarProdutos({ navigation }) {
     }
   };
 
-  const handleAtualizarEstoque = () => {
+  // Função para navegar para a tela de atualizar estoque
+  // ----------------------------------------------------
+  const atualizarEstoque = () => {
     if (produtoSelecionado && itemSelecionado) {
       navigation.navigate('AtualizarEstoque', { produto: produtoSelecionado });
       setSelectedItem(null);
     }
   };
 
-  const handleEditarProduto = () => {
+  // Função para navegar para a tela de editar produto
+  // -------------------------------------------------
+  const editarProduto = () => {
     if (produtoSelecionado && itemSelecionado) {
       navigation.navigate('EditarProduto', { produto: produtoSelecionado });
       setSelectedItem(null);
     }
   };
 
-  const handleExcluirProduto = () => {
+  // Função para navegar para a tela de excluir produto
+  // --------------------------------------------------
+  const excluirProduto = () => {
     if (produtoSelecionado && itemSelecionado) {
       navigation.navigate('ExcluirProduto', { produto: produtoSelecionado });
       setSelectedItem(null);
     }
   };
 
-  const handleEstoqueMinimo = () => {
+  // Função para alternar o filtro de estoque mínimo
+  // -----------------------------------------------
+  const estoqueMinimo = () => {
     setFiltroEstoqueMinimo(!filtroEstoqueMinimo);
   };
 
-  const handleLimparFiltroNomeProduto = () => {
+  // Função para limpar o filtro de nome do produto
+  // ----------------------------------------------
+  const limparFiltroNomeProduto = () => {
     setFiltroNomeProduto('');
     setFiltroEstoqueMinimo(false);
   };
 
-  const handleLimparFiltroTipoProduto = () => {
+  // Função para limpar o filtro de tipo do produto
+  // ----------------------------------------------
+  const limparFiltroTipoProduto = () => {
     setFiltroTipoProduto('');
     setFiltroEstoqueMinimo(false);
   };
 
+  // Renderiza cada item da lista de produtos
+  // ----------------------------------------
   const renderItem = ({ item }) => (
     <TouchableOpacity 
-      onPress={() => handleSelecionarProduto(item)}
+      onPress={() => selecionarProduto(item)}
       style={[styles.item, item.id_produto === itemSelecionado ? styles.itemSelecionado : null]}
     >
-    {/* ==================================================== */}
-     
-      <Text style={styles.nomeProduto}>{item.nome_produto}</Text>
-      <Text>{item.tipo_produto}</Text>
+      
+      <Text style={styles.nomeProduto}>Nome: {item.nome_produto}</Text>
+      <Text>Tipo: {item.tipo_produto}</Text>
       <Text>Estoque Atual: {item.estoque_atual}</Text>
       <Text>Estoque Mínimo: {item.estoque_minimo}</Text>
     </TouchableOpacity>
@@ -154,15 +177,17 @@ export default function ListarProdutos({ navigation }) {
   return (
     <View style={styles.container}>
 
+      {/* Botão para filtrar por estoque mínimo */}
       <TouchableOpacity
         style={[styles.opcaoButtonEstMin, filtroEstoqueMinimo ? styles.filtroSelecionado : null]}
-        onPress={handleEstoqueMinimo}
+        onPress={estoqueMinimo}
       >
         <Text style={[styles.opcaoTextEstMin, filtroEstoqueMinimo ? styles.opcaoSelecionadaText : null]}>
           Estoque Mínimo ({totalEstoqueMinimo})
         </Text>
       </TouchableOpacity>
 
+      {/* Filtro por nome do produto */}
       <View style={styles.opcoesContainerNomeProduto}>
         <TextInput
           style={styles.inputText}
@@ -170,14 +195,17 @@ export default function ListarProdutos({ navigation }) {
           value={filtroNomeProduto}
           onChangeText={(text) => setFiltroNomeProduto(text)}
         />
+
+        {/* Botão para limpar o filtro */}
         <TouchableOpacity
           style={styles.limparButton}
-          onPress={handleLimparFiltroNomeProduto}
+          onPress={limparFiltroNomeProduto}
         >
           <Text style={styles.limparButtonText}>Limpar</Text>
         </TouchableOpacity>
       </View>
 
+      {/* Filtro por tipo do produto */}
       <View style={styles.opcoesContainerTipoProduto}>
         <TextInput
           style={styles.inputText}
@@ -185,31 +213,38 @@ export default function ListarProdutos({ navigation }) {
           value={filtroTipoProduto}
           onChangeText={(text) => setFiltroTipoProduto(text)}
         />
+
+        {/* Botão para limpar o filtro */}
         <TouchableOpacity
           style={styles.limparButton}
-          onPress={handleLimparFiltroTipoProduto}
+          onPress={limparFiltroTipoProduto}
         >
           <Text style={styles.limparButtonText}>Limpar</Text>
         </TouchableOpacity>
       </View>
 
+      {/* Lista de produtos */}
       <FlatList
         data={produtos}
         renderItem={renderItem}
         keyExtractor={(item) => item.id_produto.toString()}
       />
 
+      {/* Botões de ação */}
       <View style={styles.buttonContainer}>
         
-        <TouchableOpacity style={styles.buttonAtualizar} onPress={handleAtualizarEstoque}>
+        {/* Botão para atualizar estoque */}
+        <TouchableOpacity style={styles.buttonAtualizar} onPress={atualizarEstoque}>
           <Text style={styles.buttonText}>Atualizar Estoque</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.buttonEditar} onPress={handleEditarProduto}>
+        {/* Botão para editar produto */}
+        <TouchableOpacity style={styles.buttonEditar} onPress={editarProduto}>
           <Text style={styles.buttonText}>  Editar Registro</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.buttonExcluir} onPress={handleExcluirProduto}>
+        {/* Botão para excluir produto */}
+        <TouchableOpacity style={styles.buttonExcluir} onPress={excluirProduto}>
           <Text style={styles.buttonText}> Excluir Registro</Text>
         </TouchableOpacity>
 
