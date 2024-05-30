@@ -166,7 +166,7 @@ export default function ListarProdutos({ navigation }) {
       onPress={() => selecionarProduto(item)}
       style={[styles.item, item.id_produto === itemSelecionado ? styles.itemSelecionado : null]}
     >
-         
+      
       <Text style={styles.nomeProduto}>Nome: {item.nome_produto}</Text>
       <Text>Tipo: {item.tipo_produto}</Text>
       <Text>Estoque Atual: {item.estoque_atual}</Text>

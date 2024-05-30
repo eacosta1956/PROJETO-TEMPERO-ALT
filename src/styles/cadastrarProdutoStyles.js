@@ -5,7 +5,7 @@ export default StyleSheet.create({
     flex: 1,
     justifyContent:'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: '#ffe58b',
   },
   contentContainer: {
     flex: 1,
@@ -19,6 +19,7 @@ export default StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 5,
+    backgroundColor: '#fff'
   },
   input2: {
     width: '100%',
@@ -28,6 +29,7 @@ export default StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 5,
+    backgroundColor: '#fff'
   },
   scrollView: {
     maxHeight: 150,
@@ -36,6 +38,7 @@ export default StyleSheet.create({
     borderColor: '#ccc',
     borderRadius: 5,
     padding: 10,
+    backgroundColor: '#fff',
     marginBottom: 10,
   },
   radioContainer: {
@@ -44,28 +47,28 @@ export default StyleSheet.create({
     marginTop: 10,
   },
   radioButton1: {
-    width: '32%', // Ajuste aqui para 32% da largura da tela, dividindo igualmente em três colunas
+    width: '32%', 
     paddingVertical: 10,
     borderRadius: 5,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#3498db',
-    marginRight: '2%', // Adicionando margem direita para separar os botões
+    backgroundColor: '#4e6f35',
+    marginRight: '2%', 
   },
   radioButton2: {
-    width: '32%', // Ajuste aqui para 32% da largura da tela, dividindo igualmente em três colunas
+    width: '32%', 
     paddingVertical: 10,
     borderRadius: 5,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#3498db',
-    marginRight: '2%', // Adicionando margem direita para separar os botões
+    backgroundColor: '#4e6f35',
+    marginRight: '2%',
   },
   radioButtonSelected: {
-    backgroundColor: '#3498db',
+    backgroundColor: '#403817',
   },
   radioText: {
-    color: '#3498db',
+    color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
   },
@@ -77,7 +80,7 @@ export default StyleSheet.create({
     marginTop: 20,
     marginBottom: 50,
     padding: 10,
-    backgroundColor: '#3498db',
+    backgroundColor: '#4e6f35',
     borderRadius: 5,
     alignItems: 'center',
   },
