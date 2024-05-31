@@ -7,7 +7,7 @@ export default StyleSheet.create({
       alignItems: 'center',
       backgroundColor: '#fff',
     },
-    input: {
+    input_qtde: {
       width: '80%',
       marginTop: 30,
       marginBottom: 20,
@@ -16,9 +16,22 @@ export default StyleSheet.create({
       borderColor: '#ccc',
       borderRadius: 5,
     },
+    input_modal: {
+      width: '60%',
+      marginBottom: 20,
+      padding: 10,
+      borderWidth: 1,
+      borderColor: '#ccc',
+      borderRadius: 5,
+    },
     label: {
-      fontSize: 16,
-      fontWeight: 'bold',
+      fontSize: 14,
+      //marginTop: 10,
+      marginBottom: 15,
+    },
+    label1: {
+      fontSize: 14,
+      //fontWeight: 'bold',
       marginTop: 10,
       marginBottom: 5,
     },
@@ -48,6 +61,8 @@ export default StyleSheet.create({
       borderColor: '#aaa',
       padding: 35,
       alignItems: 'center',
+      width: '90%', // Adicione esta linha
+      alignSelf: 'center', // Adicione esta linha
       shadowColor: '#000',
       shadowOffset: {
         width: 0,
@@ -60,18 +75,22 @@ export default StyleSheet.create({
     modalTitle: {
       marginBottom: 15,
       textAlign: 'center',
+      fontSize: 18,      
     },
     modalButtons: {
       flexDirection: 'row',
-      justifyContent: 'space-around',
+      justifyContent: 'space-between',
       width: '100%',
     },
-
-
-
-
-
-
-
+    modalButton: {
+      flex: 1, // Cada botão ocupa igualmente o espaço disponível
+      marginHorizontal: 10, // Espaçamento entre os botões
+    },
+    modalButtonText: {
+      textAlign: 'center',
+      padding: 10,
+      color: '#fff',
+      fontWeight: 'bold',
+    },
   });
   

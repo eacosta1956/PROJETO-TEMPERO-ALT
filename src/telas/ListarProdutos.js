@@ -32,6 +32,13 @@ export default function ListarProdutos({ navigation }) {
     }, [])
   );
 
+  const toBrazilianFormat = (value) => {
+    if (value === undefined || value === null || isNaN(value)) {
+      return '0,00';
+    }
+    return parseFloat(value).toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  };
+
   // Função para carregar o total de produtos e o total de produtos com estoque mínimo
   // ---------------------------------------------------------------------------------
   const carregarTotais = () => {
@@ -68,7 +75,7 @@ export default function ListarProdutos({ navigation }) {
   // ---------------------------------------------------------------------
   const carregarProdutos = () => {
     db.transaction((transaction) => {
-      let query = `SELECT p.id_produto, p.nome_produto, p.estoque_minimo, e.estoque_atual, p.tipo_produto 
+      let query = `SELECT p.id_produto, p.nome_produto, p.estoque_minimo, e.estoque_atual, e.ultimo_preco_compra, e.ultimo_preco_venda, p.tipo_produto 
         FROM produtos AS p 
         LEFT JOIN estoque AS e ON p.id_produto = e.id_produto`;
   
@@ -166,11 +173,20 @@ export default function ListarProdutos({ navigation }) {
       onPress={() => selecionarProduto(item)}
       style={[styles.item, item.id_produto === itemSelecionado ? styles.itemSelecionado : null]}
     >
-      
-      <Text style={styles.nomeProduto}>Nome: {item.nome_produto}</Text>
-      <Text>Tipo: {item.tipo_produto}</Text>
-      <Text>Estoque Atual: {item.estoque_atual}</Text>
-      <Text>Estoque Mínimo: {item.estoque_minimo}</Text>
+      <View style={styles.infoRow}>
+        <Text style={styles.nomeProduto}>Nome: {item.nome_produto}</Text>
+        <Text>Tipo: {item.tipo_produto}</Text>
+      </View>
+      <View style={styles.infoRow}>
+        <Text>Estoque Atual: {item.estoque_atual}</Text>
+        <Text>Estoque Mínimo: {item.estoque_minimo}</Text>
+      </View>
+      <View style={styles.infoRow}>
+        <Text>Preço de Compra: {toBrazilianFormat(item.ultimo_preco_compra)}</Text>
+        {item.tipo_produto === 'Bebida' && (
+          <Text>Preço de Venda: {toBrazilianFormat(item.ultimo_preco_venda)}</Text>
+        )}
+      </View>
     </TouchableOpacity>
   );
 

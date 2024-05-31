@@ -130,5 +130,10 @@ export default StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
+  infoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 5,
+  },
 
 });
