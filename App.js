@@ -39,7 +39,7 @@ export default function App() {
         }}
       >
         <Stack.Screen name="Home" component={Home} options={{ title: 'Controle de Estoque' }} />
-        <Stack.Screen name="ApagarDados" component={ApagarDados} />
+        <Stack.Screen name="ApagarDados" component={ApagarDados} options={{ title: 'Apagar Dados'}} />
         <Stack.Screen name="AtualizarEstoque" component={AtualizarEstoque} options={{ title: 'Atualizar Estoque'}}/>
         <Stack.Screen name="CadastrarProduto" component={CadastrarProduto} options={{ title: 'Cadastrar Produto'}} />
         <Stack.Screen name="EditarProduto" component={EditarProduto} options={{ title: 'Editar Produto'}} />

@@ -5,7 +5,7 @@ export default StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#fff',
+        backgroundColor: '#ffe58b',
         padding: 20,
     },
     topContainer: {
@@ -29,6 +29,7 @@ export default StyleSheet.create({
     input: {
         borderWidth: 1,
         borderColor: '#ccc',
+        backgroundColor: 'white',
         padding: 10,
         borderRadius: 5,
         width: '100%',
@@ -41,7 +42,7 @@ export default StyleSheet.create({
         width: '80%',
     },
     buttonAtivado: {
-        backgroundColor: '#007BFF',
+        backgroundColor: '#8B0000',
     },
     buttonText: {
         color: 'white',

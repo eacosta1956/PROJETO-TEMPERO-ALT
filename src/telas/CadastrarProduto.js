@@ -146,12 +146,14 @@ export default function CadastrarProduto({ navigation }) {
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
             <Text style={styles.modalText}>{modalMessage}</Text>
-            <Button
-              title="OK"
-              onPress={() => {
-                setModalVisible(false);
-              }}
-            />
+            <TouchableOpacity
+            style={styles.modalButton}
+            onPress={() => {
+              setModalVisible(false);
+            }}
+          >
+            <Text style={styles.modalButtonText}>OK</Text>
+          </TouchableOpacity>
           </View>
         </View>
       </Modal>

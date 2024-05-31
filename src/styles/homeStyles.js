@@ -10,10 +10,10 @@ export default StyleSheet.create({
     paddingHorizontal: 16,
   },
   logo: {
-    width: 200,
-    height: 100,
-    marginBottom: 20,
-    marginTop: 50,
+    marginTop: -20,
+    marginBottom: 40,
+    resizeMode: 'contain',
+
   },
   button: {
     margin: 10,

@@ -4,27 +4,28 @@ export default StyleSheet.create({
     container: {
         flex: 1,
         alignItems: 'center',
-        backgroundColor: '#fff',
+        backgroundColor: '#ffe58b',
         padding: 20,
     },
     // Estilos para o botão e o modal
     button: {
-        width: 360,
+        width: 300,
         padding: 10,
-        backgroundColor: '#3498db',
+        backgroundColor: '#4e6f35',
         borderRadius: 10,
         marginBottom: 20,
         height: 50,
     },
     buttonText: {
         color: '#fff',
-        fontSize: 18,
+        fontSize: 17,
         fontWeight: 'bold',
         textAlign: 'center',
-        textAlignVertical: 'center',
+
     },
     inputContainer: {
         marginBottom: 20,
+        backgroundColor: 'white',
     },
     input: {
     width: 200,
@@ -89,8 +90,9 @@ export default StyleSheet.create({
     },
     label: {
         fontSize: 16,
-        marginBottom: 5,
+        backgroundColor: '#ffe58b',
         fontWeight: 'bold',
+        textAlign:'center',
     },
     dateText: {
         fontSize: 14,

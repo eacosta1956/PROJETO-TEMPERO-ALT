@@ -266,7 +266,7 @@ export default function AtualizarEstoque({ route, navigation }) {
       {/* Botão para adicionar produto ao estoque */}
       {/* --------------------------------------- */}
       <TouchableOpacity
-        style={[styles.button, { backgroundColor: '#27ae60' }]}
+        style={[styles.button, { backgroundColor: '#4e6f35' }]}
         onPress={() => {
           const qtdInt = parseInt(quantidade);
           if (qtdInt > 0) {
@@ -285,7 +285,7 @@ export default function AtualizarEstoque({ route, navigation }) {
       {/* Botão para retirar produto do estoque */}
       {/* ------------------------------------- */}
       <TouchableOpacity
-        style={[styles.button, { backgroundColor: '#e74c3c' }]}
+        style={[styles.button, { backgroundColor: '#8B0000' }]}
         onPress={retirarProduto}
       >
         <Text style={styles.buttonText}>Retirar do Estoque</Text>
@@ -319,8 +319,7 @@ export default function AtualizarEstoque({ route, navigation }) {
 
         {/* TextInput para preço de compra ou venda */}
         <Text style={styles.label1}>{operacao === 'adicionar' ? "Preencher Preço de Compra" : "Preencher Preço de Venda"}</Text>
-        <TextInput
-          style={styles.input_modal}
+        <TextInput style={styles.input_modal}
           //placeholder={operacao === 'adicionar' ? "Preço de Compra" : "Preço de Venda"}
           keyboardType="numeric"
           value={modalInputValue}

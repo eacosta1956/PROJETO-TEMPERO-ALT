@@ -7,7 +7,7 @@ export default function Home({ navigation }) {
   return (
     
     <View style={styles.container}>
-      
+
       {/* Botões de ação para as funcionalidades */}
       <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
         

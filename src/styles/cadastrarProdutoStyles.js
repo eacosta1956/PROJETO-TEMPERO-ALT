@@ -97,10 +97,10 @@ export default StyleSheet.create({
   },
   modalView: {
     margin: 20,
-    backgroundColor: 'white',
+    backgroundColor: '#E5B924',
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#aaa',
+    borderColor: '0,0,0',
     padding: 35,
     alignItems: 'center',
     shadowColor: '#000',
@@ -113,7 +113,22 @@ export default StyleSheet.create({
     elevation: 5,
   },
   modalText: {
+    fontWeight: 'bold',
+    fontSize: 15,
     marginBottom: 15,
     textAlign: 'center',
   },
+  modalButton: {
+    backgroundColor: '#4e6f35',
+    borderRadius: 10,
+    padding: 10,
+    elevation: 2,
+    width: 100,  
+  },
+  modalButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+
 });

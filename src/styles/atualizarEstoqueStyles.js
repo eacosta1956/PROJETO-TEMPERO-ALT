@@ -5,7 +5,7 @@ export default StyleSheet.create({
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor: '#fff',
+      backgroundColor: '#ffe58b',
     },
     input_qtde: {
       width: '80%',
@@ -13,11 +13,13 @@ export default StyleSheet.create({
       marginBottom: 20,
       padding: 10,
       borderWidth: 1,
+      backgroundColor: '#fff',
       borderColor: '#ccc',
       borderRadius: 5,
     },
     input_modal: {
       width: '60%',
+      backgroundColor: 'white',
       marginBottom: 20,
       padding: 10,
       borderWidth: 1,
@@ -55,14 +57,14 @@ export default StyleSheet.create({
     },
     modalView: {
       margin: 20,
-      backgroundColor: 'white',
+      backgroundColor: '#E5B924',
       borderRadius: 20,
       borderWidth: 1,
       borderColor: '#aaa',
       padding: 35,
       alignItems: 'center',
-      width: '90%', // Adicione esta linha
-      alignSelf: 'center', // Adicione esta linha
+      width: '90%', 
+      alignSelf: 'center', 
       shadowColor: '#000',
       shadowOffset: {
         width: 0,
@@ -83,14 +85,16 @@ export default StyleSheet.create({
       width: '100%',
     },
     modalButton: {
-      flex: 1, // Cada botão ocupa igualmente o espaço disponível
-      marginHorizontal: 10, // Espaçamento entre os botões
+      backgroundColor: '#4e6f35',
+      borderRadius: 10,
+      padding: 10,
+      elevation: 2,
+      width: 100,  
     },
     modalButtonText: {
-      textAlign: 'center',
-      padding: 10,
-      color: '#fff',
+      color: 'white',
       fontWeight: 'bold',
+      textAlign: 'center',
     },
   });
   
