@@ -21,18 +21,22 @@ export default function RelatorioLucro({ route, navigation }) {
                     transaction.executeSql(
                         `SELECT 
                             p.nome_produto,
-                            SUM(e.quantidade * (e.preco_venda - e.preco_compra)) AS lucro_total
+                            SUM(CASE WHEN e.quantidade >= 0 THEN e.quantidade * e.preco_compra ELSE 0 END) AS total_compra,
+                            SUM(CASE WHEN e.quantidade < 0 THEN ABS(e.quantidade) * e.preco_venda ELSE 0 END) AS total_venda
                         FROM entrada_saida e
                         JOIN produtos p ON e.id_produto = p.id_produto
-                        WHERE e.quantidade >= 0 
-                        AND p.tipo_produto = 'Bebida'
+                        WHERE p.tipo_produto = 'Bebida'
                         AND e.data_atualizacao >= ? || ' 00:00:00'  
                         AND e.data_atualizacao <= ? || ' 23:59:59'
                         GROUP BY p.nome_produto
                         ORDER BY p.nome_produto ASC;`,
                         [dataInicial, dataFinal],
                         (_, { rows }) => {
-                            const relatorio = rows._array;
+                            const relatorio = rows._array.map(item => ({
+                                ...item,
+                                lucro_total: item.total_venda - item.total_compra
+                            }));
+                            console.log('Resultado da consulta ao banco de dados:', relatorio); // Adicionando console.log aqui
                             resolve(relatorio);
                         },
                         (_, error) => {
@@ -97,6 +101,15 @@ export default function RelatorioLucro({ route, navigation }) {
         );
     };
 
+    // Função para converter a data de AAAA/MM/DD para DD/MM/AAAA.
+    const convertToDDMMYYYY = (dateString) => {
+        const [year, month, day] = dateString.split('/');
+        return `${day}/${month}/${year}`;
+    };
+    
+    const dataInicialFormatada = convertToDDMMYYYY(dataInicial);
+    const dataFinalFormatada = convertToDDMMYYYY(dataFinal);
+
     return (
         <View style={styles.container}>
             
@@ -105,7 +118,7 @@ export default function RelatorioLucro({ route, navigation }) {
                 <View style={styles.modalContainer}>
                     <View style={styles.modalContent}>
                         <Text style={styles.headerText}>Relatório de Lucro com Bebidas</Text>
-                        <Text style={styles.dateText}>Período: {dataInicial} a {dataFinal}</Text>
+                        <Text style={styles.dateText}>Período: {dataInicialFormatada} a {dataFinalFormatada}</Text>
 
                         {/* Verificação se o relatório está carregando */}
                         {isLoading ? (

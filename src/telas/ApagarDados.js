@@ -11,15 +11,23 @@ export default function ApagarDados({ navigation }) {
     // Estado para controlar se o botão de apagar está ativado ou não
     const [botaoAtivado, setBotaoAtivado] = useState(false);
 
+    // Função para converter a data de DD/MM/AAAA para AAAA/MM/DD.
+    const convertToYYYYMMDD = (dateString) => {
+        const [day, month, year] = dateString.split('/');
+        return `${year}/${month}/${day}}`;
+    };
+
     // Função para excluir registros da tabela entrada_saida até a data informada
     // --------------------------------------------------------------------------
-        const handleExcluirRegistros = () => {
+    const handleExcluirRegistros = () => {
+        const dataExclusaoFormatada = convertToYYYYMMDD(dataExclusao);
+
         if (dataExclusao) {
             const sqlQuery = `DELETE FROM entrada_saida WHERE data_atualizacao <= ?`;
             db.transaction((transaction) => {
                 transaction.executeSql(
                     sqlQuery,
-                    [dataExclusao],
+                    [dataExclusaoFormatada],
                     (_, result) => {
                         console.log('Registros excluídos com sucesso');
                         navigation.navigate('Home'); // Navegue de volta para a tela inicial após excluir os registros
@@ -49,7 +57,7 @@ export default function ApagarDados({ navigation }) {
 
         setDataExclusao(formattedDate);
 
-        // Verifica se a data está completamente preenchida no formato AAAA/MM/DD
+        // Verifica se a data está completamente preenchida no formato DD/MM/AAAA
         // ----------------------------------------------------------------------
         if (formattedDate.length === 10) {
             setBotaoAtivado(true); // Ativa o botão se a data estiver completa
@@ -66,7 +74,7 @@ export default function ApagarDados({ navigation }) {
                     <Text style={styles.label}>Data limite de exclusão</Text>
                     <TextInput
                         style={styles.input}
-                        placeholder="AAAA/MM/DD"
+                        placeholder="DD/MM/AAAA"
                         onChangeText={handleInputChange}
                         value={dataExclusao}
                         keyboardType="numeric"

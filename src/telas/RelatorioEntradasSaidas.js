@@ -58,6 +58,15 @@ export default function RelatorioEntradasSaidas({ route, navigation }) {
         gerarRelatorio(); // Chama a função para gerar o relatório
     }, []); // Array vazio de dependências indica que o efeito é executado apenas uma vez, após a montagem do componente
 
+    // Função para converter a data de AAAA/MM/DD para DD/MM/AAAA.
+    const convertToDDMMYYYY = (dateString) => {
+        const [year, month, day] = dateString.split('/');
+        return `${day}/${month}/${year}`;
+    };
+
+    const dataInicialFormatada = convertToDDMMYYYY(dataInicial);
+    const dataFinalFormatada = convertToDDMMYYYY(dataFinal);
+
     return (
         <View style={styles.container}>
             {/* Modal principal */}
@@ -65,7 +74,7 @@ export default function RelatorioEntradasSaidas({ route, navigation }) {
                 <View style={styles.modalContainer}>
                     <View style={styles.modalContent}>
                         <Text style={styles.headerText}>Relatório de Entradas e Saídas</Text>
-                        <Text style={styles.dateText}>Período: {dataInicial} a {dataFinal}</Text>
+                        <Text style={styles.dateText}>Período: {dataInicialFormatada} a {dataFinalFormatada}</Text>
                         
                         {/* Verifica se os dados estão sendo carregados */}
                         {isLoading ? (
@@ -104,7 +113,7 @@ export default function RelatorioEntradasSaidas({ route, navigation }) {
                 <View style={styles.modalContainer}>
                     <View style={styles.modalContent}>
                         <Text style={styles.headerText}>Erro</Text>
-                        <Text style={styles.errorMessage}>Por favor, insira uma data válida no formato AAAA/MM/DD.</Text>
+                        <Text style={styles.errorMessage}>Por favor, insira uma data válida no formato DD/MM/AAAA</Text>
                         
                         {/* Botão para fechar o modal de erro */}
                         <TouchableOpacity style={styles.closeButton} onPress={fecharModalErro}>

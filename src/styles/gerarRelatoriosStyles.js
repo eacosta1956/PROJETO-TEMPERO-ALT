@@ -9,7 +9,7 @@ export default StyleSheet.create({
     },
     // Estilos para o botão e o modal
     button: {
-        width: 300,
+        width: 310,
         padding: 10,
         backgroundColor: '#4e6f35',
         borderRadius: 10,
@@ -65,6 +65,7 @@ export default StyleSheet.create({
         backgroundColor: '#e74c3c',
         borderRadius: 5,
         alignItems: 'center',
+        width: '90%',
     },
     periodSeparator: {
         marginBottom: 10,
