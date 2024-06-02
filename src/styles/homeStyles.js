@@ -9,11 +9,15 @@ export default StyleSheet.create({
     backgroundColor: '#ffe58b',
     paddingHorizontal: 16,
   },
+  logoContainer: {
+    marginBottom: 10,
+  },
   logo: {
     marginTop: -20,
     marginBottom: 40,
-    resizeMode: 'contain',
-
+    width: 300,
+    height: 200,
+    resizeMode: 'contain', 
   },
   button: {
     margin: 10,

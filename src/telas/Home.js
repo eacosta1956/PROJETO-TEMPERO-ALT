@@ -8,6 +8,11 @@ export default function Home({ navigation }) {
     
     <View style={styles.container}>
 
+      {/* Adicionando o logo */}
+      <View style={styles.logoContainer}>
+        <Image source={require('../assets/Logo_Tempero.png')} style={styles.logo} />
+      </View>
+
       {/* Botões de ação para as funcionalidades */}
       <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
         
