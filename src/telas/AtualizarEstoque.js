@@ -250,7 +250,7 @@ export default function AtualizarEstoque({ route, navigation }) {
             <Text>Estoque Atual: {produto.estoque_atual}</Text>
             <Text>Estoque Mínimo: {produto.estoque_minimo}</Text>
             <Text>Último Preço de Compra: {toBrazilianFormat(produto.ultimo_preco_compra)}</Text>
-          <Text>Último Preço de Venda: {toBrazilianFormat(produto.ultimo_preco_venda)}</Text>
+            {produto.tipo_produto === 'Bebida' && (<Text style={styles.label}>Último Preço de Venda: {toBrazilianFormat(produto.ultimo_preco_venda)}</Text> )}
           </>
         )}
       </View>
@@ -353,7 +353,11 @@ export default function AtualizarEstoque({ route, navigation }) {
         <View style={styles.modalCenteredView}>
           <View style={styles.modalView}>
             <Text style={styles.modalText}>{modalMessage}</Text>
-            <Button title="OK" onPress={fecharModal} />
+
+            <TouchableOpacity style={[styles.modalButton, { backgroundColor: '#27ae60' }]} onPress={fecharModal}>
+            <Text style={styles.modalButtonText}>OK</Text>
+            </TouchableOpacity>
+
           </View>
         </View>
       </Modal>

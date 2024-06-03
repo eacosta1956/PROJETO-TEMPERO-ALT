@@ -188,7 +188,7 @@ export default function EditarProduto({ route, navigation }) {
           <View style={styles.modalView}>
             <Text style={styles.modalText}>{modalMessage}</Text>
             <Button
-              title="OK"
+            title="OK"
               onPress={() => {
                 setModalVisible(false);
                 if (operacaoSucesso) {

@@ -10,7 +10,7 @@ export default StyleSheet.create({
     paddingHorizontal: 16,
   },
   logoContainer: {
-    marginBottom: 10,
+    marginBottom: 5,
   },
   logo: {
     marginTop: -20,

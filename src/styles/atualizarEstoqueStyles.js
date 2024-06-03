@@ -96,5 +96,14 @@ export default StyleSheet.create({
       fontWeight: 'bold',
       textAlign: 'center',
     },
+    modalText: {
+      fontWeight:'bold',
+      textAlign: 'center',
+      fontSize: 15,
+      marginBottom: 10,
+    }
+    
   });
   
+
+

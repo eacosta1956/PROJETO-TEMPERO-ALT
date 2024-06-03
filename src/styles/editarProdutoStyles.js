@@ -5,6 +5,7 @@ export default StyleSheet.create({
       flex: 1,
       paddingHorizontal: 20,
       paddingTop: 20,
+      backgroundColor: '#ffe58b',
     },
     infoContainer: {
       marginBottom: 20,
@@ -26,7 +27,8 @@ export default StyleSheet.create({
       width: '100%',
       height: 30,
       borderWidth: 1,
-      borderColor: '#ccc',
+      backgroundColor: 'white',
+      borderColor: 'white',
       borderRadius: 5,
       paddingHorizontal: 10,
       marginBottom: 10,
@@ -34,7 +36,7 @@ export default StyleSheet.create({
     button: {
       width: '50%',
       alignSelf: 'center',
-      backgroundColor: 'blue',
+      backgroundColor: '#4e6f35',
       paddingHorizontal: 20,
       paddingVertical: 10,
       borderRadius: 5,
@@ -48,7 +50,7 @@ export default StyleSheet.create({
     },
     modalView: {
       margin: 20,
-      backgroundColor: 'white',
+      backgroundColor: '#E5B924',
       borderRadius: 20,
       borderWidth: 1,
       borderColor: '#aaa',
@@ -66,6 +68,9 @@ export default StyleSheet.create({
     modalText: {
       marginBottom: 15,
       textAlign: 'center',
+      fontWeight: 'bold',
+      fontSize: 15,
     }
+    
   });
   
