@@ -7,6 +7,8 @@ export default function RelatorioLucro({ route, navigation }) {
     const { dataInicial, dataFinal } = route.params; // Extração dos parâmetros de dataInicial e dataFinal
     const [relatorio, setRelatorio] = useState([]); // Estado para armazenar o relatório de lucro
     const [lucroTotal, setLucroTotal] = useState(0); // Estado para armazenar o lucro total
+    const [receitaTotal, setReceitaTotal] = useState(0); // Estado para armazenar a receita total
+    const [despesaTotal, setDespesaTotal] = useState(0); // Estado para armazenar a despesa total
     const [modalVisible, setModalVisible] = useState(true); // Estado para controlar a visibilidade do modal principal
     const [modalErrorVisible, setModalErrorVisible] = useState(false); // Estado para controlar a visibilidade do modal de erro
     const [isSortedByProfit, setIsSortedByProfit] = useState(false); // Estado para controlar a ordenação do relatório
@@ -21,8 +23,12 @@ export default function RelatorioLucro({ route, navigation }) {
                     transaction.executeSql(
                         `SELECT 
                             p.nome_produto,
-                            SUM(CASE WHEN e.quantidade >= 0 THEN e.quantidade * e.preco_compra ELSE 0 END) AS total_compra,
-                            SUM(CASE WHEN e.quantidade < 0 THEN ABS(e.quantidade) * e.preco_venda ELSE 0 END) AS total_venda
+                            SUM(CASE WHEN e.quantidade >= 0 THEN e.quantidade ELSE 0 END) AS quantidade_comprada,
+                            SUM(CASE WHEN e.quantidade < 0 THEN ABS(e.quantidade) ELSE 0 END) AS quantidade_vendida,
+                            SUM(CASE WHEN e.quantidade < 0 THEN ABS(e.quantidade) * e.preco_venda ELSE 0 END) AS receita_venda,
+                            SUM(CASE WHEN e.quantidade >= 0 THEN e.quantidade * e.preco_compra ELSE 0 END) AS despesa_compra,
+                            (SUM(CASE WHEN e.quantidade < 0 THEN ABS(e.quantidade) * e.preco_venda ELSE 0 END) -
+                            SUM(CASE WHEN e.quantidade >= 0 THEN e.quantidade * e.preco_compra ELSE 0 END)) AS lucro_total
                         FROM entrada_saida e
                         JOIN produtos p ON e.id_produto = p.id_produto
                         WHERE p.tipo_produto = 'Bebida'
@@ -32,11 +38,7 @@ export default function RelatorioLucro({ route, navigation }) {
                         ORDER BY p.nome_produto ASC;`,
                         [dataInicial, dataFinal],
                         (_, { rows }) => {
-                            const relatorio = rows._array.map(item => ({
-                                ...item,
-                                lucro_total: item.total_venda - item.total_compra
-                            }));
-                            console.log('Resultado da consulta ao banco de dados:', relatorio); // Adicionando console.log aqui
+                            const relatorio = rows._array;
                             resolve(relatorio);
                         },
                         (_, error) => {
@@ -50,8 +52,12 @@ export default function RelatorioLucro({ route, navigation }) {
 
         fetchRelatorioLucro().then(relatorio => {
             const totalLucro = relatorio.reduce((acc, item) => acc + (item.lucro_total || 0), 0);
+            const totalReceita = relatorio.reduce((acc, item) => acc + (item.receita_venda || 0), 0);
+            const totalDespesa = relatorio.reduce((acc, item) => acc + (item.despesa_compra || 0), 0);
             setRelatorio(relatorio);
             setLucroTotal(totalLucro);
+            setReceitaTotal(totalReceita);
+            setDespesaTotal(totalDespesa);
             setIsLoading(false); // Marca o carregamento como completo
         }).catch(error => {
             console.log('Erro ao obter relatório de lucro:', error);
@@ -82,8 +88,8 @@ export default function RelatorioLucro({ route, navigation }) {
     // Função para ordenar os dados do relatório
     const sortData = () => {
         const sortedData = isSortedByProfit 
-            ? [...relatorio].sort((a, b) => a.nome_produto.localeCompare(b.nome_produto)) 
-            : [...relatorio].sort((a, b) => b.lucro_total - a.lucro_total); 
+        ? [...relatorio].sort((a, b) => a.nome_produto.localeCompare(b.nome_produto)) 
+        : [...relatorio].sort((a, b) => b.lucro_total - a.lucro_total); 
         setRelatorio(sortedData);
         setIsSortedByProfit(!isSortedByProfit);
         flatListRef.current.scrollToOffset({ animated: true, offset: 0 });
@@ -96,6 +102,10 @@ export default function RelatorioLucro({ route, navigation }) {
                 <Text style={styles.itemText}>
                     Produto: <Text style={styles.productName}>{item.nome_produto}</Text>
                 </Text>
+                <Text>Quantidade Comprada: {item.quantidade_comprada}</Text>
+                <Text>Quantidade Vendida: {item.quantidade_vendida}</Text>
+                <Text>Receita: {formatCurrency(item.receita_venda)}</Text>
+                <Text>Despesa: {formatCurrency(item.despesa_compra)}</Text>
                 <Text>Lucro: {formatCurrency(item.lucro_total)}</Text>
             </View>
         );
@@ -106,7 +116,7 @@ export default function RelatorioLucro({ route, navigation }) {
         const [year, month, day] = dateString.split('/');
         return `${day}/${month}/${year}`;
     };
-    
+
     const dataInicialFormatada = convertToDDMMYYYY(dataInicial);
     const dataFinalFormatada = convertToDDMMYYYY(dataFinal);
 
@@ -138,11 +148,23 @@ export default function RelatorioLucro({ route, navigation }) {
                                     />
                                 )}
 
-                                {/* Exibição do total de lucro */}
+                                {/* Exibição do total de receita, despesa e lucro */}
                                 <View style={styles.totalContainer}>
-                                    <Text style={styles.totalHeader}>Lucro Total:</Text>
-                                    <Text style={styles.totalAmount}>{formatCurrency(lucroTotal)}</Text>
+                                    <View style={styles.totalRow}>
+                                        <Text style={styles.totalHeader}>Receita Total:</Text>
+                                        <Text style={[styles.totalAmount, { textAlign: 'right' }]}>{formatCurrency(receitaTotal)}</Text>
+                                    </View>
+                                    <View style={styles.totalRow}>
+                                        <Text style={styles.totalHeader}>Despesa Total:</Text>
+                                        <Text style={[styles.totalAmount, { textAlign: 'right' }]}>{formatCurrency(despesaTotal)}</Text>
+                                    </View>
+                                    <View style={styles.totalRow}>
+                                        <Text style={styles.totalHeader}>Lucro Total:</Text>
+                                        <Text style={[styles.totalAmount, { textAlign: 'right' }]}>{formatCurrency(lucroTotal)}</Text>
+                                    </View>
                                 </View>
+
+
 
                                 {/* Botões para ordenação e fechamento do modal */}
                                 <View style={styles.buttonContainer}>

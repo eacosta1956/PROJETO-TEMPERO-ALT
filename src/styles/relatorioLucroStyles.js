@@ -34,11 +34,24 @@ export default StyleSheet.create({
         marginVertical: 5,
     },
     totalContainer: {
+        marginTop: 15,
+        paddingHorizontal: 10,
+        marginVertical: 10,
+        // Se necessário, adicione padding ou margens adicionais aqui
+    },
+    totalRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        width: '100%',
-        paddingHorizontal: 20,
-        marginTop: 20,
+        alignItems: 'center',
+        marginBottom: 5, // Ajuste conforme necessário para o espaçamento entre as linhas
+    },
+    totalHeader: {
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    totalAmount: {
+        fontSize: 16,
+        fontWeight: 'bold',
     },
     itemText: {
         fontSize: 16,
