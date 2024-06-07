@@ -261,7 +261,7 @@ export default function ListarProdutos({ navigation }) {
 
         {/* Botão para excluir produto */}
         <TouchableOpacity style={styles.buttonExcluir} onPress={excluirProduto}>
-          <Text style={styles.buttonText}> Excluir Registro</Text>
+          <Text style={styles.buttonText}> Excluir Produto</Text>
         </TouchableOpacity>
 
       </View>

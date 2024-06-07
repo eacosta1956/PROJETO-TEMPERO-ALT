@@ -5,7 +5,6 @@ export default StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         backgroundColor: '#fff',
-        padding: 20,
     },
     modalContainer: {
         flex: 1,
@@ -14,14 +13,15 @@ export default StyleSheet.create({
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
     modalContent: {
+        alignItems: 'center',
         backgroundColor: '#fff',
-        padding: 20,
+        padding: 5,
         borderRadius: 10,
         width: '90%',
         maxHeight: '95%',
     },
     headerText: {
-        fontSize: 20,
+        fontSize: 18,
         fontWeight: 'bold',
         marginBottom: 20,
         marginTop: 20, // Ajuste o valor para mover mais para cima
@@ -31,12 +31,12 @@ export default StyleSheet.create({
         marginBottom: 20,
     },
     itemContainer: {
-        marginVertical: 5,
+        marginVertical: 2,
     },
     totalContainer: {
-        marginTop: 15,
-        paddingHorizontal: 10,
-        marginVertical: 10,
+        marginTop: 20,
+        paddingHorizontal: 20,
+        marginVertical: 3,
         // Se necessário, adicione padding ou margens adicionais aqui
     },
     totalRow: {
@@ -48,13 +48,14 @@ export default StyleSheet.create({
     totalHeader: {
         fontSize: 16,
         fontWeight: 'bold',
+        marginRight: 10, // Adicionar margem à direita para separação do valor
     },
     totalAmount: {
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: 'bold',
     },
     itemText: {
-        fontSize: 16,
+        fontSize: 14,
     },
     productName: {
         fontWeight: 'bold',
@@ -62,8 +63,7 @@ export default StyleSheet.create({
     buttonContainer: {
         width: '80%',
         alignSelf: 'center',
-        marginTop: 20, 
-        
+        marginTop: 10, 
     },
     sortButton: {
         marginBottom: 10,
@@ -79,7 +79,7 @@ export default StyleSheet.create({
     buttonText: {
         color: 'white',
         fontWeight: 'bold',
-        fontSize: 20,
+        fontSize: 16,
         textAlign: 'center',
     },
     errorMessage: {
@@ -88,12 +88,14 @@ export default StyleSheet.create({
         textAlign: 'center',
         marginBottom: 20,
     },
-    totalHeader: {
-        fontSize: 20,
-        fontWeight: 'bold',
+    infoRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 1,
     },
-    totalAmount: {
-        fontSize: 20,
-        fontWeight: 'bold',
-    },
+    separator: {
+        borderBottomColor: '#ccc',
+        borderBottomWidth: 1,
+        marginVertical: 3,
+    },    
 });

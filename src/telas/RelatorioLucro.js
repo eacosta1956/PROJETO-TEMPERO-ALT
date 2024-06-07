@@ -102,14 +102,20 @@ export default function RelatorioLucro({ route, navigation }) {
                 <Text style={styles.itemText}>
                     Produto: <Text style={styles.productName}>{item.nome_produto}</Text>
                 </Text>
-                <Text>Quantidade Comprada: {item.quantidade_comprada}</Text>
-                <Text>Quantidade Vendida: {item.quantidade_vendida}</Text>
-                <Text>Receita: {formatCurrency(item.receita_venda)}</Text>
-                <Text>Despesa: {formatCurrency(item.despesa_compra)}</Text>
+                <View style={styles.infoRow}>
+                    <Text>Qtde Comprada: {item.quantidade_comprada}</Text>
+                    <Text>Qtde Vendida: {item.quantidade_vendida}</Text>
+                </View>
+                <View style={styles.infoRow}>
+                    <Text>Receita: {formatCurrency(item.receita_venda)}</Text>
+                    <Text>Despesa: {formatCurrency(item.despesa_compra)}</Text>
+                </View>
                 <Text>Lucro: {formatCurrency(item.lucro_total)}</Text>
+                <View style={styles.separator}></View>
             </View>
         );
     };
+
 
     // Função para converter a data de AAAA/MM/DD para DD/MM/AAAA.
     const convertToDDMMYYYY = (dateString) => {
@@ -127,8 +133,10 @@ export default function RelatorioLucro({ route, navigation }) {
             <Modal animationType="slide" transparent={true} visible={modalVisible}>
                 <View style={styles.modalContainer}>
                     <View style={styles.modalContent}>
-                        <Text style={styles.headerText}>Relatório de Lucro com Bebidas</Text>
-                        <Text style={styles.dateText}>Período: {dataInicialFormatada} a {dataFinalFormatada}</Text>
+                        <View style={styles.titleContainer}>
+                            <Text style={styles.headerText}>Relatório de Lucro com Bebidas</Text>
+                            <Text style={styles.dateText}>Período: {dataInicialFormatada} a {dataFinalFormatada}</Text>
+                        </View>
 
                         {/* Verificação se o relatório está carregando */}
                         {isLoading ? (
@@ -152,19 +160,17 @@ export default function RelatorioLucro({ route, navigation }) {
                                 <View style={styles.totalContainer}>
                                     <View style={styles.totalRow}>
                                         <Text style={styles.totalHeader}>Receita Total:</Text>
-                                        <Text style={[styles.totalAmount, { textAlign: 'right' }]}>{formatCurrency(receitaTotal)}</Text>
+                                        <Text style={styles.totalAmount}>{formatCurrency(receitaTotal)}</Text>
                                     </View>
                                     <View style={styles.totalRow}>
                                         <Text style={styles.totalHeader}>Despesa Total:</Text>
-                                        <Text style={[styles.totalAmount, { textAlign: 'right' }]}>{formatCurrency(despesaTotal)}</Text>
+                                        <Text style={styles.totalAmount}>{formatCurrency(despesaTotal)}</Text>
                                     </View>
                                     <View style={styles.totalRow}>
                                         <Text style={styles.totalHeader}>Lucro Total:</Text>
-                                        <Text style={[styles.totalAmount, { textAlign: 'right' }]}>{formatCurrency(lucroTotal)}</Text>
+                                        <Text style={styles.totalAmount}>{formatCurrency(lucroTotal)}</Text>
                                     </View>
                                 </View>
-
-
 
                                 {/* Botões para ordenação e fechamento do modal */}
                                 <View style={styles.buttonContainer}>

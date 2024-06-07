@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Modal, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, Modal, FlatList, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
 import { db } from '../database/AbreConexao'; // Importação do módulo de banco de dados
 import styles from '../styles/relatorioDespesasStyles'; // Importação do arquivo de estilos
 
@@ -68,17 +68,13 @@ export default function RelatorioDespesas({ route, navigation }) {
             const combinedRelatorio = [
                 { header: 'Bebidas' },
                 ...bebidas,
-                { totalHeader: 'Despesa Total com Bebidas', total: totalBebidas },
                 { spacer: true },
                 { header: 'Comidas' },
                 ...comidas,
-                { totalHeader: 'Despesa Total com Comidas', total: totalComidas },
                 { spacer: true },
                 { header: 'Descartáveis' },
                 ...descartaveis,
-                { totalHeader: 'Despesa Total com Descartáveis', total: totalDescartaveis },
                 { spacer: true },
-                { totalHeader: 'TOTAL GERAL DAS DESPESAS', total: totalBebidas + totalComidas + totalDescartaveis } // Total geral das despesas
             ];
 
             setRelatorio(combinedRelatorio); // Atualiza o estado do relatório combinado
@@ -122,20 +118,6 @@ export default function RelatorioDespesas({ route, navigation }) {
                 </View>
             );
         }
-        if (item.totalHeader) {
-            return (
-                <View>
-                    <View style={styles.line} />
-                    {item.total !== undefined && ( // Verificando se 'total' está definido
-                        <View style={styles.totalContainer}>
-                            <Text style={styles.totalHeader}>{item.totalHeader}:</Text>
-                            <Text style={styles.totalAmount}>{formatCurrency(item.total)}</Text>
-                        </View>
-                    )}
-                    <View style={styles.line} />
-                </View>
-            );
-        }
         if (item.spacer) {
             return <View style={styles.spacer} />;
         }
@@ -162,9 +144,10 @@ export default function RelatorioDespesas({ route, navigation }) {
 
     return (
         <View style={styles.container}>
+
             {/* Modal principal */}
             <Modal animationType="slide" transparent={true} visible={modalVisible}>
-                <View style={styles.modalContainer}>
+                <SafeAreaView style={styles.modalContainer}>
                     <View style={styles.modalContent}>
                         <Text style={styles.headerText}>Relatório de Despesas</Text>
                         <Text style={styles.dateText}>Período: {dataInicialFormatada} a {dataFinalFormatada}</Text>
@@ -174,28 +157,54 @@ export default function RelatorioDespesas({ route, navigation }) {
                             <Text>Carregando...</Text> // Indicador de carregamento
                         ) : (
                             relatorio.length > 0 ? (
-                                <FlatList
-                                    data={relatorio}
-                                    keyExtractor={(item, index) => index.toString()} // Função para extrair chaves únicas dos itens da lista
-                                    renderItem={renderItem} // Função para renderizar cada item da lista
-                                    contentContainerStyle={{ paddingBottom: 50 }} // Estilo do conteúdo da lista
-                                />
+                                
+                                    <FlatList
+                                        data={relatorio}
+                                        keyExtractor={(item, index) => index.toString()} // Função para extrair chaves únicas dos itens da lista
+                                        renderItem={renderItem} // Função para renderizar cada item da lista
+                                    />
+                                    
+                                
                             ) : (
                                 <Text style={styles.errorMessage}>Não há dados para exibir.</Text> // Mensagem de erro caso não haja dados no relatório
                             )
                         )}
-
-                        {/* Botão para fechar o modal */}
-                        <TouchableOpacity style={styles.closeButton} onPress={fecharModal}>
-                            <Text style={styles.buttonText}>Fechar</Text>
-                        </TouchableOpacity>
+                        <View style={styles.totalsContainer}>
+                                        <View style={styles.line} />
+                                        <View style={styles.totalContainer}>
+                                            <Text style={styles.totalHeader}>Despesa com Bebidas:</Text>
+                                            <Text style={styles.totalAmount}>{formatCurrency(despesaTotalBebidas)}</Text>
+                                        </View>
+                                        <View style={styles.line} />
+                                        <View style={styles.totalContainer}>
+                                            <Text style={styles.totalHeader}>Despesa com Comidas:</Text>
+                                            <Text style={styles.totalAmount}>{formatCurrency(despesaTotalComidas)}</Text>
+                                        </View>
+                                        <View style={styles.line} />
+                                        <View style={styles.totalContainer}>
+                                            <Text style={styles.totalHeader}>Despesa com Descartáveis:</Text>
+                                            <Text style={styles.totalAmount}>{formatCurrency(despesaTotalDescartaveis)}</Text>
+                                        </View>
+                                        <View style={styles.line} />
+                                        <View style={styles.totalContainer}>
+                                            <Text style={styles.totalHeader}>TOTAL DAS DESPESAS:</Text>
+                                            <Text style={styles.totalAmount}>{formatCurrency(totalGeral)}</Text>
+                                        </View>
+                                        <View style={styles.line} />
+                                        <TouchableOpacity style={styles.closeButton} onPress={fecharModal}>
+                                            <Text style={styles.buttonText}>Fechar</Text>
+                                        </TouchableOpacity>
+                                    </View>
                     </View>
-                </View>
+                </SafeAreaView>
             </Modal>
+
+
+
 
             {/* Modal de erro */}
             <Modal animationType="slide" transparent={true} visible={modalErrorVisible}>
-                <View style={styles.modalContainer}>
+                <SafeAreaView style={styles.modalContainer}>
                     <View style={styles.modalContent}>
                         <Text style={styles.headerText}>Erro</Text>
                         <Text style={styles.errorMessage}>Por favor, insira uma data válida no formato DD/MM/AAAA.</Text>
@@ -205,7 +214,7 @@ export default function RelatorioDespesas({ route, navigation }) {
                             <Text style={styles.buttonText}>Fechar</Text>
                         </TouchableOpacity>
                     </View>
-                </View>
+                </SafeAreaView>
             </Modal>
         </View>
     );

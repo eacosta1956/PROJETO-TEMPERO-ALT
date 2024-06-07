@@ -81,13 +81,13 @@ export default function GerarRelatorios() {
             </View>
             <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.button} onPress={() => navigateToRelatorio('RelatorioEntradasSaidas')}>
-                    <Text style={styles.buttonText}>Emitir Relatório de Entradas e Saídas</Text>
+                    <Text style={styles.buttonText}>Relatório de Entradas e Saídas</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.button} onPress={() => navigateToRelatorio('RelatorioDespesas')}>
-                    <Text style={styles.buttonText}>Emitir Relatório de Despesas</Text>
+                    <Text style={styles.buttonText}>Relatório de Despesas</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.button} onPress={() => navigateToRelatorio('RelatorioLucro')}>
-                    <Text style={styles.buttonText}>Emitir Relatório de Lucro</Text>
+                    <Text style={styles.buttonText}>Relatório de Lucro</Text>
                 </TouchableOpacity>
             </View>
         </View>

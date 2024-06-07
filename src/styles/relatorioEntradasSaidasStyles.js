@@ -130,5 +130,10 @@ export default StyleSheet.create({
         textAlign: 'center',
         marginBottom: 20,
     },
+    separator: {
+        borderBottomColor: '#ccc',
+        borderBottomWidth: 1,
+        marginVertical: 3,
+    },  
 });
 

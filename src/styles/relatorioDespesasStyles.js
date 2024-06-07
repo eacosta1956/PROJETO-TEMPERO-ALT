@@ -1,12 +1,8 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
-
     container: {
         flex: 1,
-        alignItems: 'center',
-        backgroundColor: '#fff',
-        padding: 20,
     },
     modalContainer: {
         flex: 1,
@@ -15,81 +11,77 @@ export default StyleSheet.create({
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
     modalContent: {
-        backgroundColor: '#fff',
-        padding: 20,
-        borderRadius: 10,
         width: '90%',
+        backgroundColor: 'white',
+        borderRadius: 10,
+        padding: 20,
         maxHeight: '95%',
     },
     headerText: {
         fontSize: 20,
         fontWeight: 'bold',
         marginBottom: 10,
-        textAlign: 'center',
     },
     dateText: {
         fontSize: 16,
-        marginBottom: 20,
-        textAlign: 'center',
+        marginBottom: 10,
     },
-
+    scrollViewContainer: {
+        paddingBottom: 20,
+    },
     sectionContainer: {
-        alignItems: 'center',
-        marginVertical: 10,
+        marginTop: 10,
     },
     sectionHeader: {
         fontSize: 18,
         fontWeight: 'bold',
-        textAlign: 'center',
     },
-    
     itemContainer: {
+        padding: 5,
+        borderBottomWidth: 1,
+        borderBottomColor: '#ccc',
+    },
+    itemText: {
+        fontSize: 14,
+    },
+    productName: {
+        fontWeight: 'bold',
+    },
+    totalsContainer: {
+        marginTop: 10,
+    },
+    line: {
+        height: 1,
+        backgroundColor: '#ccc',
         marginVertical: 5,
     },
+    totalContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingVertical: 1,
+    },
     totalHeader: {
-        fontSize: 16,
+        fontSize: 13,
+        fontWeight: 'bold',
     },
     totalAmount: {
-        fontSize: 16,
+        fontSize: 14,
     },
     closeButton: {
-        marginTop: 20,
-        padding: 10,
-        backgroundColor: '#d6301d',
+        marginTop: 10,
+        backgroundColor: '#007bff',
+        paddingVertical: 10,
         borderRadius: 5,
         alignItems: 'center',
     },
     buttonText: {
         color: 'white',
-        fontWeight: 'bold',
-        fontSize: 20,
-        textAlign: 'center',
-    },
-
-    itemText: {
         fontSize: 16,
-    },
-    productName: {
         fontWeight: 'bold',
-    },
-    totalContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: '100%',
-    },
-    
-
-    line: {
-        borderBottomWidth: 1,
-        borderBottomColor: '#ccc',
-        marginVertical: 10,
-        width: '100%',
-    },
-    spacer: {
-        height: 20,
     },
     errorMessage: {
         color: 'red',
-        marginTop: 10,
+        textAlign: 'center',
+        marginBottom: 20,
     },
 });

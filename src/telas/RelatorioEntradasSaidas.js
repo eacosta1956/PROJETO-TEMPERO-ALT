@@ -92,6 +92,7 @@ export default function RelatorioEntradasSaidas({ route, navigation }) {
                                             <Text>Entradas: {item.total_entradas}</Text>
                                             <Text>Saídas: {item.total_saidas}</Text>
                                             <Text>Diferença: {item.total_entradas - item.total_saidas}</Text>
+                                            <View style={styles.separator}></View>
                                         </View>
                                     )}
                                 />

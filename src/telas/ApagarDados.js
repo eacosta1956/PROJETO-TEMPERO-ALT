@@ -49,7 +49,7 @@ export default function ApagarDados({ navigation }) {
 
         let formattedDate = '';
         for (let i = 0; i < formattedText.length; i++) {
-            if (i === 4 || i === 6) {
+            if (i === 2 || i === 4) {
                 formattedDate += '/';
             }
             formattedDate += formattedText[i];
