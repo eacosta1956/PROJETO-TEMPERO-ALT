@@ -11,7 +11,7 @@ export default StyleSheet.create({
       width: '80%',
       marginTop: 30,
       padding: 10,
-      backgroundColor: '#3498db',
+      backgroundColor: 'red',
       borderRadius: 5,
       alignItems: 'center',
     },
@@ -37,6 +37,8 @@ export default StyleSheet.create({
     modalText: {
       marginBottom: 15,
       textAlign: 'center',
+      fontWeight: 'bold',
+      fontSize: 15,
     },
     buttonContainer: {
       flexDirection: 'row',
@@ -48,9 +50,9 @@ export default StyleSheet.create({
       borderRadius: 5,
       padding: 10,
       elevation: 2,
-      backgroundColor: '#3498db',
+      backgroundColor: 'green',
     },
     buttonModalCancel: {
-      backgroundColor: '#aaa',
+      backgroundColor: 'red',
     },
   });

@@ -7,7 +7,7 @@ export default StyleSheet.create({
         backgroundColor: '#ffe58b',
         padding: 20,
     },
-    // Estilos para o botão e o modal
+
     button: {
         width: 350,
         padding: 10,
@@ -34,8 +34,8 @@ export default StyleSheet.create({
     borderWidth: 1,
     borderRadius: 5,
     paddingHorizontal: 10,
-    textAlign: 'center', // Centraliza o texto horizontalmente
-    textAlignVertical: 'center', // Centraliza o texto verticalmente
+    textAlign: 'center', 
+    textAlignVertical: 'center',
     },
     modalContainer: {
         flex: 1,
@@ -97,7 +97,7 @@ export default StyleSheet.create({
     },
     dateText: {
         fontSize: 14,
-        fontWeight: 'normal', // Pode ajustar o peso da fonte conforme necessário
+        fontWeight: 'normal', 
         marginBottom: 10,
         textAlign: 'center',
     },
@@ -140,10 +140,12 @@ export default StyleSheet.create({
     },
     modalText: {
         marginBottom: 20,
+        fontSize: 15,
         textAlign: 'center',
+        fontWeight: 'bold',
     },
     closeButton: {
-        backgroundColor: '#2196F3',
+        backgroundColor: '#4e6f35',
         padding: 10,
         borderRadius: 5,
     },
