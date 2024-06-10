@@ -87,7 +87,7 @@ export default function GerarRelatorios() {
                     <Text style={styles.buttonText}>Relatório de Despesas</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.button} onPress={() => navigateToRelatorio('RelatorioLucro')}>
-                    <Text style={styles.buttonText}>Relatório de Lucro</Text>
+                    <Text style={styles.buttonText}>Relatório de Lucro das Bebidas</Text>
                 </TouchableOpacity>
             </View>
         </View>

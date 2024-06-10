@@ -8,7 +8,7 @@ export default StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        backgroundColor: '#ffe58b',
     },
     modalContent: {
         width: '90%',
@@ -21,10 +21,12 @@ export default StyleSheet.create({
         fontSize: 20,
         fontWeight: 'bold',
         marginBottom: 10,
+        textAlign: 'center',
     },
     dateText: {
         fontSize: 16,
         marginBottom: 10,
+        textAlign: 'center',
     },
     scrollViewContainer: {
         paddingBottom: 20,

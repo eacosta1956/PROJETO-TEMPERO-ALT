@@ -5,7 +5,7 @@ export default StyleSheet.create({
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor: '#fff',
+      backgroundColor: '#ffe58b',
     },
     button: {
       width: '80%',
@@ -28,7 +28,7 @@ export default StyleSheet.create({
     },
     modalView: {
       margin: 20,
-      backgroundColor: 'white',
+      backgroundColor: '#E5B924',
       borderRadius: 10,
       padding: 35,
       alignItems: 'center',

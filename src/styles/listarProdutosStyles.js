@@ -102,7 +102,8 @@ export default StyleSheet.create({
     alignItems: 'center',
     marginTop: 5,
     marginBottom: 5,
-    width: '100%',
+    width: '95%',
+    marginLeft: 10,
   },
   buttonAtualizar: {
     padding: 8,
