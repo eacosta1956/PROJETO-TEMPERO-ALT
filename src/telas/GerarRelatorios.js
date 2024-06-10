@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Modal } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import styles from '../styles/gerarRelatoriosStyles';
 
@@ -7,6 +7,8 @@ export default function GerarRelatorios() {
     const navigation = useNavigation();
     const [dataInicial, setDataInicial] = useState('');
     const [dataFinal, setDataFinal] = useState('');
+    const [modalVisible, setModalVisible] = useState(false);
+    const [modalMessage, setModalMessage] = useState('');
 
     // Função para lidar com a entrada de texto e formatar as datas inseridas.
     const lidarEntradaDeTexto = (text, setDate) => {
@@ -44,7 +46,8 @@ export default function GerarRelatorios() {
     // Função para navegar para diferentes tipos de relatórios com as datas fornecidas.
     const navigateToRelatorio = (tipo) => {
         if (!isValidDate(dataInicial) || !isValidDate(dataFinal)) {
-            Alert.alert('Data Inválida', 'Por favor, insira datas válidas no formato DD/MM/AAAA.');
+            setModalMessage('Por favor, insira datas válidas no formato DD/MM/AAAA.');
+            setModalVisible(true);
             return;
         }
         const formattedDataInicial = convertToYYYYMMDD(dataInicial);
@@ -90,6 +93,25 @@ export default function GerarRelatorios() {
                     <Text style={styles.buttonText}>Relatório de Lucro das Bebidas</Text>
                 </TouchableOpacity>
             </View>
+
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => setModalVisible(false)}
+            >
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalView}>
+                        <Text style={styles.modalText}>{modalMessage}</Text>
+                        <TouchableOpacity
+                            style={styles.closeButton}
+                            onPress={() => setModalVisible(false)}
+                        >
+                            <Text style={styles.closeButtonText}>Fechar</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
         </View>
     );
 }

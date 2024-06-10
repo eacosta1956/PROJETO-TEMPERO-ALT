@@ -131,5 +131,25 @@ export default StyleSheet.create({
         textAlign: 'center',
         marginBottom: 20,
     },
+    modalView: {
+        width: 300,
+        padding: 20,
+        backgroundColor: '#E5B924',
+        borderRadius: 10,
+        alignItems: 'center',
+    },
+    modalText: {
+        marginBottom: 20,
+        textAlign: 'center',
+    },
+    closeButton: {
+        backgroundColor: '#2196F3',
+        padding: 10,
+        borderRadius: 5,
+    },
+    closeButtonText: {
+        color: 'white',
+        textAlign: 'center',
+    },
 });
 
